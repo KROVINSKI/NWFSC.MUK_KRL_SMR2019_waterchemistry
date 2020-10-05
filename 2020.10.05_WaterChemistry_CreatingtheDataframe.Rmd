@@ -880,6 +880,312 @@ H2Ochemdf.daynight.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
 
 
 
+ 
+## 13.2 Histogram plot- all moats, all treatments, all periods 
+
+ Cdml %>% ggplot(data=.)+geom_histogram(aes(x=aTemperature), binwidth = .05) + 
+                          xlim(5,30) +
+                          ylim(0, 10000)
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+## 13.2a Histrogram Scaled by Time Narrative 
+# Section below walks how to quantify each "bin" by the observation period = 6.8minutes  
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+## 13.2b Histogram scaled by time
+#find duration of each observations in hours
+
+durObsHours <- 6.8/60
+
+# the count (number of  observations in each bin) is scale by time duration of each obs
+# option to also include polygon
+# could fix the vline to only show the value relevant for each plot
+#vline could show acutal mean temperature, not just target
+# each bin shows 0.2 degrees
+p <- ggplot(Cdml, aes(aTemperature)) +
+                  geom_histogram(aes(y=..count..*durObsHours), 
+                                              binwidth = 0.2) +
+                   #   geom_freqpoly(aes(y=..count..*durObs)) +
+      geom_vline(xintercept = c(11,12,13,14), colour = "red") +
+      facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed") +
+      theme_bw()
+p
+
+#just show bins < 12 hours
+p + ylim(c(0,12))
+ 
+## Conclusion- problem remains of how to show what percent of time it spent around
+##             the average- not plain "stacking time". 
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+## 13.3 Cumulative Frequency Distribution
+
+p <- ggplot(Cdml, aes(aTemperature)) +
+            stat_ecdf(aes(colour = moats)) + 
+            geom_vline(xintercept = c(11,12,13,14), colour = "red") +
+            facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed")  +
+            theme_bw()
+p
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+## 12.3a  Using a ECDF to better visualize distribution
+#Compute empirical cumulative distribution : The empirical cumulative distribution 
+#                                            function (ECDF) provides an alternative 
+#                                            visualisation of distribution. 
+#                                         Compared to other visualisations that rely 
+#                                         on density (like geom_histogram()), the 
+#                                         ECDF doesn't require any tuning parameters 
+#                                         and handles both continuous and categorical 
+#                                         variables. 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+## 13.3b ECDF Plot
+
+p <-      ggplot(Cdml, aes(aTemperature)) +
+                stat_ecdf(aes(colour = moats)) + 
+                geom_vline(xintercept = Cdml.daynight.summary$mean, colour = "red") +
+                facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed")  +
+                theme_bw()
+p
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+## 13.3c Creating a function to incorporate our statisitics- show our averages
+
+ coolECDF <- function(d, dsum, treat, per){
+   dsum <- dsum %>% filter(treatment == treat & period == per )
+   p <- d %>% filter(treatment == treat & period == per ) %>% ggplot(aes(aTemperature)) +
+     stat_ecdf(aes(colour = moats)) + 
+     geom_vline(xintercept = dsum$mean, colour = "red") +
+     ggtitle(paste(treat, per)) +
+     theme_bw()
+   return(p)
+ }
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+  levels(Cdml$treatment)
+  levels(factor(Cdml$period))
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+## 13.3d Using the coolECDF function per treatment & period
+
+        cfd.a.d <- coolECDF(Cdml, Cdml.daynight.summary, "allchange", "day")
+        cfd.a.n <- coolECDF(Cdml, Cdml.daynight.summary, "allchange", "night")
+        cfd.c.d <- coolECDF(Cdml, Cdml.daynight.summary, "current", "day")
+        cfd.c.n <- coolECDF(Cdml, Cdml.daynight.summary, "current", "night")
+        cfd.h.d <- coolECDF(Cdml, Cdml.daynight.summary, "hightemperature", "day")
+        cfd.h.n <- coolECDF(Cdml, Cdml.daynight.summary, "hightemperature", "night")
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+## 13.4 Incorporating Grid Arrange to display the ECDF plots        
+# Basic Grid Arrange
+
+      grid.arrange(cfd.a.d, cfd.c.d, cfd.h.d, nrow = 1)
+ 
+      grid.arrange(cfd.a.n, cfd.c.n, cfd.h.n, nrow = 1) 
+      
+      #make a list of all the plots then pass the list to grid.arrange()
+      ecdfList <- list(cfd.a.d, cfd.c.d, cfd.h.d, cfd.a.n, cfd.c.n, cfd.h.n)
+      grid.arrange(grobs = ecdfList, ncol=3)
+      
+      
+ 
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+## 13.5 Investigating tails
+#to look a little more closely at the tails
+#lower 1% 
+      
+lowerTail <- function(p){
+  return(p + ylim(c(0,0.01)))
+}
+
+upperTail <- function(p){
+  return(p + ylim(c(0.99,1.0)))
+}
+
+lowerP <- lapply(ecdfList, lowerTail)
+grid.arrange(grobs = lowerP, ncol=3)
+
+upperP <- lapply(ecdfList, upperTail)
+grid.arrange(grobs = upperP, ncol=3) 
+
+ # p + ylim(c(0,0.01))
+ # #upper 1%
+ # p + ylim(c(0.99,1))
+ # 
+ # #to look a little more closely at the tails
+ # #lower 1% 
+ # cfd.a.d + ylim(c(0,0.01))
+ # #upper 1%
+ # p + ylim(c(0.99,1))
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+## 13.6 Plain time series
+# example plot
+
+ ggplot(subset(Cdml[Cdml$treatment == "allchange", ], 
+               period %in% ("night")), 
+        aes(x=dateTime, y=aTemperature)) + 
+        geom_point(aes(colour=moats, point=)) + 
+        ylim (10, 16) 
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+## 13.7 Violin Plot 
+# example plot
+ p_allchg_d_facet_violin <- ggplot(subset(Cdml[Cdml$treatment == "allchange", ]), 
+                                   aes(x=moats, y=aTemperature, colour=moats)) + 
+                            geom_hline(yintercept = avg_allchgDayaTemp) +
+                            geom_jitter(shape=16, position=position_jitter(0.2), 
+                                  color="light grey") + 
+                            geom_hline(yintercept = avg_allchgNightaTemp) +
+                            geom_violin(aes(colour = period)) +
+                            stat_summary(fun=mean, geom="point", size=1, color="purple")  + 
+                            facet_grid(period~moats) 
+ 
+ p_allchg_d_facet_violin
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 13.7a faceted violin plot
+
+ p_allchg_d_facet_violin <- ggplot(subset(Cdml[Cdml$treatment == "allchange", ]), 
+                                   aes(x=moats, y=aTemperature, colour=moats)) + 
+                            geom_hline(yintercept = avg_allchgDayaTemp) +
+                            geom_jitter(shape=16, position=position_jitter(0.2), 
+                                  color="light grey") + 
+                            geom_hline(yintercept = avg_allchgNightaTemp) +
+                            geom_violin(aes(colour = period)) +
+                            geom_boxplot() +
+                            stat_summary(fun=mean, geom="point", size=1, color="purple")  + 
+                            facet_grid(period~moats) 
+ 
+ 
+ p_allchg_d_facet_violin
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+## 13.7b Simple violin plot
+# note that day and night are not filtered
+vp <-    ggplot(filteredFrame, 
+                aes(x=filteredFrame$aTemperature, 
+                y=filteredFrame$treatment)) + 
+        geom_violin() 
+
+vp
+
+#display the plot
+vp
+
+# Rotate the violin plot
+vp + coord_flip()
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+## 13.7c Simple violin plot with ggplot, filtered day and night
+
+p_allchg_n <- ggplot(subset(Cdml[Cdml$treatment == "allchange", ], 
+                            period %in% ("night")), 
+                            aes(x=moats, y=aTemperature, colour=treatment)) + 
+              stat_summary(fun=mean, geom="point", size=2, color="red")  + 
+              geom_jitter(shape=16, position=position_jitter(0.2), 
+                            color="blue") + 
+              geom_hline(yintercept = 13.9) +
+              geom_violin() +
+              geom_boxplot(width= 0.1) +
+  
+              ggtitle("Day Period - All Change Treatment")
+
+
+#display the plot
+p_allchg_n
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+
+## 13.7c Simple violin plot, filtered day and night, jitter points for Temp Jumps
+p_allchg_d_jitter <- ggplot(subset(Cdml[Cdml$treatment == "allchange", ], 
+                                   period %in% ("day")), 
+                            aes(x=moats, y=aTemperature, colour=treatment)) + 
+                     stat_summary(fun=mean, geom="point", size=2, color="red")  + 
+                    geom_jitter(aes(colour = tDeltaThreshold)) +
+                    geom_hline(yintercept = avg_allchgDayaTemp) +
+                    geom_boxplot() +
+                    ggtitle("Day Period - All Change Treatment- Temp Jumps (.5C)")
+
+
+#display the plot
+p_allchg_d_jitter
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+
+
+
+
+ 
+#*********************************
+ ## 14.) aTemp bands investig.
+#*********************************
+
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+# Selecting for the high aTemperature Band
+ investig.HighaTemp <- Cdml %>% 
+   filter(aTemperature>= 14.50 & aTemperature<=15.50) %>%
+   filter(treatment %in% c("current", 
+                           "allchange", 
+                           "hightemperature")) %>%
+   filter(period != "other")
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+ # Time series plot 
+ ggplot(subset(investig.HighaTemp[investig.HighaTemp$treatment == "current", ], 
+               period %in% ("night")), 
+        aes(x=dateTime, y=aTemperature)) + 
+   geom_point(aes(colour=moats, point=)) +
+   ylim (10, 20)
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+ # Selecting for the high aTemperature Band
+ investig.LowaTemp <- scrubdml %>% 
+   filter(aTemperature>= 10.50 & aTemperature<=11.50) %>%
+   filter(treatment %in% c("current", 
+                           "allchange", 
+                           "hightemperature", 
+                           "ambient_M04", 
+                           "ambient_M05")) %>%
+   filter(period != "other")
+ 
+ #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+
+ggplot(subset(Cdml[Cdml$treatment == "hightemperature", ],
+              period %in% ("day")), 
+              aes(x=dateTime, y=aTemperature)) + 
+              geom_point(aes(colour=moats)) + 
+              ylim (10, 16)
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+
+p_cur_night_investig <- ggplot(subset(investig.HighaTemp[investig.HighaTemp$treatment == "current", ], 
+                                       period %in% ("night")), 
+                                aes(x=moats, y=aTemperature, colour=treatment)) + 
+   geom_boxplot() +
+   geom_boxplot(data= scrubdml, x=moats, y=aTemperature) +
+   ggtitle("CurrentTreatment, Night Period")
+
+p_cur_night_investig 
+
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+ 
+ # Time series plot 
+ ggplot(subset(investig.LowaTemp[investig.LowaTemp$treatment == "hightemperature", ], 
+               period %in% ("night")), 
+        aes(x=dateTime, y=aTemperature)) + 
+   geom_point(aes(colour=moats, point=)) +
+   ylim (9, 12.5)
+ 
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+ 
+ 
+
 
 
 
