@@ -343,9 +343,9 @@ Differences between dataframes outlined in the graphic below:
 ![Different Dataframes' Pipeline](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/dataframe.pipeline.H2Ochemdf.png)
 
 
-#### 6.6 Removing the Acclimation Period 
+#### 7.1 Removing the Acclimation Period 
 The acclimation and the time after animals were removed from the system was designated other
-```{r 6.6 Removing the Acclimation Period }
+```{r 7.1 Removing the Acclimation Period }
 
 # Removing "other" period from day and night 
 # not including acclimation period in this investigation
@@ -355,9 +355,7 @@ H2Ochemdf <- dml %>% filter(period != "other")
 #### Water Chemistry Dataframe Created "H2Ochemdf"
 
 
-
-
-```{r 7.0 Bringing in Salinity }
+```{r 7.1a Bringing in Salinity }
 all_salinity <- read.csv(file = "KRL19_salinityreadings_all.csv", stringsAsFactors = FALSE)
 all_salinity$PSU_ObsDate <- ""
 
