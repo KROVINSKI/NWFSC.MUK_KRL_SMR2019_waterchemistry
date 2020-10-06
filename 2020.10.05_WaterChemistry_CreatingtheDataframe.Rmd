@@ -881,9 +881,10 @@ H2Ochemdf.daynight.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
 # 13.0 Water Chemistry Around Treatment Means
 
 The following graphs show dissolved oxygen and pH observations. 
-The goal is to describe the time the system spent around the 
-
-
+The goal is to describe the time the system spent at different set points.
+The empirical cumulative distribution function (ECDF) provides an alternative visualisation of distribution.
+Compared to other visualizations that rely on density (like geom_histogram()), the 
+ECDF doesn't require any tuning parameters and handles both continuous and categorical variables. 
 
  
 ```{r}
@@ -937,11 +938,11 @@ durObsHours <- 6.8/60
 # could fix the vline to only show the value relevant for each plot
 #vline could show acutal mean temperature, not just target
 # each bin shows 0.2 degrees
-plot13a_DO <- ggplot(Cdml, aes(Cdml$actualDOmg)) +
+plot13a_DO <- ggplot(H2Ochemdf, aes(actualDOmg)) +
                   geom_histogram(aes(y=..count..*durObsHours), 
                                               binwidth = 0.2) +
                    #   geom_freqpoly(aes(y=..count..*durObs)) +
-      geom_vline(xintercept = c(11,12,13,14), colour = "red") +
+      geom_vline(xintercept = c(4,6,8,10), colour = "red") +
       facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed") +
       theme_bw()
 plot13a_DO
@@ -951,38 +952,45 @@ plot13a_DO
 ##             the average- not plain "stacking time". 
 
 ```
-```
 
 #### 13.3 Cumulative Frequency Distribution
-```{r  13.3 Cumulative Frequency Distribution}
+```{r  13.3a Cumulative Frequency Distribution}
 
-ECFDplot <- ggplot(Cdml, aes(aTemperature)) +
+ECFDplot <- ggplot(H2Ochemdf, aes(actualDOmg)) +
             stat_ecdf(aes(colour = moats)) + 
-            geom_vline(xintercept = c(11,12,13,14), colour = "red") +
+            geom_vline(xintercept = c(4,6,8,10), colour = "red") +
             facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed")  +
             theme_bw()
 ECFDplot 
 
 ```
 
-p <- ggplot(Cdml, aes(aTemperature)) +
+
+```{r 13.3b Cumulative Frequency Distribution, facet wrap, geomlines by DO percent}
+ECDFplot2 <- ggplot(H2Ochemdf, aes(percentDO)) +
             stat_ecdf(aes(colour = moats)) + 
-            geom_vline(xintercept = c(11,12,13,14), colour = "red") +
+            geom_vline(xintercept = c(.6,.7,.8,.9), colour = "red") +
             facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed")  +
             theme_bw()
-p
+ECDFplot2
 
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-## 12.3a  Using a ECDF to better visualize distribution
-#Compute empirical cumulative distribution : The empirical cumulative distribution 
-#                                            function (ECDF) provides an alternative 
-#                                            visualisation of distribution. 
-#                                         Compared to other visualisations that rely 
-#                                         on density (like geom_histogram()), the 
-#                                         ECDF doesn't require any tuning parameters 
-#                                         and handles both continuous and categorical 
-#                                         variables. 
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+```
+
+```{r 13.3c Cumulative Frequency Distribution MOATs grouped by Treatment Colored by MOATs}
+
+ECDFplot13.3c <-  ggplot(H2Ochemdf, aes(actualDOmg)) +
+                    stat_ecdf(aes(colour = moats)) + 
+                    geom_vline(xintercept = H2Ochemdf.daynight.summary$mean, colour = "red") +
+                    facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed")  +
+                    theme_bw()
+ECDFplot13.3c
+
+
+
+```
+
+
 
 ## 13.3b ECDF Plot
 
