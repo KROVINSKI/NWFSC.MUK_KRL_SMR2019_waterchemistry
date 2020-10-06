@@ -880,41 +880,82 @@ H2Ochemdf.daynight.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
 
 # 13.0 Water Chemistry Around Treatment Means
 
+The following graphs show dissolved oxygen and pH observations. 
+The goal is to describe the time the system spent around the 
+
+
+
  
+```{r}
 ## 13.2 Histogram plot- all moats, all treatments, all periods 
 
  Cdml %>% ggplot(data=.)+geom_histogram(aes(x=aTemperature), binwidth = .05) + 
                           xlim(5,30) +
                           ylim(0, 10000)
+```
+
  
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-
-## 13.2a Histrogram Scaled by Time Narrative 
-# Section below walks how to quantify each "bin" by the observation period = 6.8minutes  
-
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-
-## 13.2b Histogram scaled by time
+ 
+##### # 13.2a Histrogram Scaled by Time
+Section below walks how to quantify each "bin" by the observation period = 6.8minutes
+ 
+```{r}
 #find duration of each observations in hours
 
 durObsHours <- 6.8/60
-
 # the count (number of  observations in each bin) is scale by time duration of each obs
 # option to also include polygon
 # could fix the vline to only show the value relevant for each plot
 #vline could show acutal mean temperature, not just target
 # each bin shows 0.2 degrees
-p <- ggplot(Cdml, aes(aTemperature)) +
+plot13.a_temp <- ggplot(Cdml, aes(aTemperature)) +
                   geom_histogram(aes(y=..count..*durObsHours), 
                                               binwidth = 0.2) +
                    #   geom_freqpoly(aes(y=..count..*durObs)) +
       geom_vline(xintercept = c(11,12,13,14), colour = "red") +
       facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed") +
       theme_bw()
-p
+plot13.a_temp
+
+
+```
+ 
+```{r}
+
+
 
 #just show bins < 12 hours
-p + ylim(c(0,12))
+plot13.a_temp + ylim(c(0,12))
+
+```
+
+```{r}
+
+
+#find duration of each observations in hours
+
+durObsHours <- 6.8/60
+# the count (number of  observations in each bin) is scale by time duration of each obs
+# option to also include polygon
+# could fix the vline to only show the value relevant for each plot
+#vline could show acutal mean temperature, not just target
+# each bin shows 0.2 degrees
+plot13a_DO <- ggplot(Cdml, aes(Cdml$actualDOmg)) +
+                  geom_histogram(aes(y=..count..*durObsHours), 
+                                              binwidth = 0.2) +
+                   #   geom_freqpoly(aes(y=..count..*durObs)) +
+      geom_vline(xintercept = c(11,12,13,14), colour = "red") +
+      facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed") +
+      theme_bw()
+plot13a_DO
+
+
+```
+```
+
+
+
+
  
 ## Conclusion- problem remains of how to show what percent of time it spent around
 ##             the average- not plain "stacking time". 
