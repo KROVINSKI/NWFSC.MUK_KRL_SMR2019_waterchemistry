@@ -517,7 +517,7 @@ cycling between different salinity measurements required moving between characte
 ## PSUprevObs 
 
 # Sailinity Assumption        28.8
-#           Dates w/o         Dates without measurment 23~30SEP20
+#           Dates w/o         Dates without measurement 23~30SEP20
 28.8
 
 
