@@ -335,6 +335,12 @@ ggplot(subset(dml[dml$treatment == "allchange", ],
 
 ```
 
+# 7.) Bringing in Salinity   
+Creating the Water Chemistry Dataframe.
+Differences between dataframes outlined in the graphic below:
+
+
+![Different Dataframes' Pipeline](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/dataframe.pipeline.H2Ochemdf.png)
 
 
 #### 6.6 Removing the Acclimation Period 
@@ -350,7 +356,7 @@ H2Ochemdf <- dml %>% filter(period != "other")
 
 
 
-# 7.) Bringing in Salinity   
+
 ```{r 7.0 Bringing in Salinity }
 all_salinity <- read.csv(file = "KRL19_salinityreadings_all.csv", stringsAsFactors = FALSE)
 all_salinity$PSU_ObsDate <- ""
@@ -537,7 +543,6 @@ H2Ochemdf$Final_PSU <- as.numeric(case_when(
 ))
 
 ```
-
 
 
 #### 8.7 Exmaple of Salinity Corrections (table/Tribble)
