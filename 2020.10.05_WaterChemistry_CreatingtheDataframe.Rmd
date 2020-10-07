@@ -1118,7 +1118,59 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
         
         
 ```
-#### 13.4
+#### 13.5 Actual Milligrams of Dissolved Oxygen with Empirical Cumulative Distribution "Cool" function (ECDF) 
+
+
+```{r 13.5 Using the Actual Milligrams of Dissolved Oxygen with Empirical Cumulative Distribution "Cool" function (ECDF) }
+
+#*********************************
+## DO & COOL ECDF function
+#********************************* 
+## 13.5a Using the coolECDF function per treatment & period for DOmg
+
+  DO.cfd.allchg.d <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "allchange", "day",)
+  DO.cfd.allchg.r <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "allchange", "D2Nramp",)
+  DO.cfd.allchg.n <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "allchange", "night")
+        
+        
+  DO.cfd.cur.d <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "current", "day")
+  DO.cfd.cur.r <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "current", "D2Nramp")
+  DO.cfd.cur.n <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "current", "night")
+        
+        
+  DO.cfd.hi.d <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "day")
+  DO.cfd.hi.r <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "D2Nramp")
+  DO.cfd.hi.n <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "night")
+
+        
+## 13.4b Incorporating Grid Arrange to display the ECDF plots        
+# Basic Grid Arrange
+  # Note extra period - the ramp period
+
+      grid.arrange(DO.cfd.allchg.d , DO.cfd.cur.d, DO.cfd.hi.d, nrow = 1)
+      
+      grid.arrange(DO.cfd.allchg.r , DO.cfd.cur.r, DO.cfd.hi.r, nrow = 1)
+      
+      grid.arrange(DO.cfd.allchg.n , DO.cfd.cur.n, DO.cfd.hi.n, nrow = 1)
+ 
+      
+      #make a list of all the plots then pass the list to grid.arrange()
+      ecdfList <- list(DO.cfd.allchg.d, 
+                          DO.cfd.allchg.r,
+                            DO.cfd.allchg.n,
+            
+                       DO.cfd.cur.d, 
+                          DO.cfd.cur.r, 
+                            DO.cfd.cur.n, 
+                       
+                       DO.cfd.hi.d, 
+                          DO.cfd.hi.r,
+                            DO.cfd.hi.n
+                                        )
+      grid.arrange(grobs = ecdfList, ncol=3)        
+        
+    
+```
 
  
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
