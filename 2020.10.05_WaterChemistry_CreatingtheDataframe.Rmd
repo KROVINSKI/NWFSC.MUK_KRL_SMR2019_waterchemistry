@@ -335,15 +335,28 @@ ggplot(subset(dml[dml$treatment == "allchange", ],
 
 ```
 
-# 7.) Bringing in Salinity   
+# 7.) Creating different dataframes
+
+#### 7.0 Cdml "Cleaned" dml dataframe is Cdml
+```{r}
+Cdml <- dml %>% filter(!moats %in% c("M03", "M04", "M05", "M11")) %>%
+  filter(aTemperature>= 5 & aTemperature<=30) %>%
+  filter(treatment %in% c("current", "allchange", "hightemperature")) %>%
+  filter(period != "other")
+```
+
+
+
 Creating the Water Chemistry Dataframe.
 Differences between dataframes outlined in the graphic below:
 
 
+
 ![Different Dataframes' Pipeline](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/dataframe.pipeline.H2Ochemdf.png)
 
+#### Water Chemistry Dataframe Created "H2Ochemdf"
 
-#### 7.1 Removing the Acclimation Period 
+#### 7.1 Removing the Acclimation Period on H2Ochemdf 
 The acclimation and the time after animals were removed from the system was designated other
 ```{r 7.1 Removing the Acclimation Period }
 
@@ -352,9 +365,10 @@ The acclimation and the time after animals were removed from the system was desi
 
 H2Ochemdf <- dml %>% filter(period != "other")
 ```
-#### Water Chemistry Dataframe Created "H2Ochemdf"
 
 
+
+#### 7.1a Bringing in Salinity
 ```{r 7.1a Bringing in Salinity }
 all_salinity <- read.csv(file = "KRL19_salinityreadings_all.csv", stringsAsFactors = FALSE)
 all_salinity$PSU_ObsDate <- ""
