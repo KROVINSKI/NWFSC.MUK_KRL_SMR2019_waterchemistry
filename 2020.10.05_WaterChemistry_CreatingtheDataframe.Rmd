@@ -858,7 +858,7 @@ hitempNightDO
 
 dim(H2Ochemdf)
 
-H2Ochemdf.daynight.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
+H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
   summarize(sd = sd(actualDOmg, na.rm = TRUE), 
             mean = mean(actualDOmg, na.rm = TRUE), 
             median = median(actualDOmg, na.rm = TRUE),
@@ -869,7 +869,7 @@ H2Ochemdf.daynight.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-#write.csv(H2Ochemdf.daynight.summary, "2020.09.22_H2Ochemdf_daynight_summary.csv")
+write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.07_H2Ochemdf_daynight_actualDO_summary.csv")
 
 ```
 
@@ -1182,6 +1182,35 @@ p_allchg_d_jitter <- ggplot(subset(Cdml[Cdml$treatment == "allchange", ],
 p_allchg_d_jitter
 
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
+
+
+#14.) pH
+
+```{r 14.1 PH Day/Night Summary}
+# 14.0) pH Day/Night Summary
+#### 
+
+
+dim(H2Ochemdf)
+
+H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
+  summarize(sd = sd(pH, na.rm = TRUE), 
+            mean = mean(pH, na.rm = TRUE), 
+            median = median(pH, na.rm = TRUE),
+            IQR = IQR(pH, na.rm = TRUE),
+            n = n(), .groups= "drop_last") %>%
+  
+  mutate(se = sd/sqrt(n)) %>%
+  mutate(ci = se*1.96)
+
+
+write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.07_H2Ochemdf_daynight_pH_summary.csv")
+```
+
+
+
+
+
 
 
 
