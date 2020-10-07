@@ -935,7 +935,54 @@ ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
 ```
 
 
-# 13.0 Water Chemistry Around Treatment Means
+# 13.0 pH Water Chemistry Plots
+
+```{r 12.3 Water Chemistry - pH Summary Table Plots}
+ggplot(H2Ochemdf, aes(treatment, pH)) +
+            geom_jitter(color = "grey") +
+            geom_boxplot(notch = TRUE, outlier.shape = NA, colour = "green") +
+            geom_point(data = H2Ochemdf.daynight.pH.summary, aes(x=treatment, y=mean), size=5, color = "purple") +
+            geom_errorbar(data =H2Ochemdf.daynight.pH.summary,
+                          aes(x=treatment, y=mean, ymin = mean-sd, ymax = mean+sd),
+                          color = "blue") +
+            geom_errorbar(data = H2Ochemdf.daynight.pH.summary,
+                          aes(x=treatment, y=mean, ymin = mean-ci, ymax = mean+ci),
+                          colour = "red") +
+            facet_wrap(~period) +
+            ggtitle("All Treatments, Water Chemistry pH, Across Periods") +
+            theme_bw()
+
+
+```
+
+
+#### 13.1a Simple Violin Plot for pH
+```{r 13.1a Simple Violin Plot for pH}
+## 13.1a Simple violin plot
+# note that day and night are not filtered
+pHviolinplot1 <-    ggplot(H2Ochemdf, 
+                aes(x=H2Ochemdf$pH, 
+                y=H2Ochemdf$treatment)) + 
+        geom_violin() 
+
+pHviolinplot1
+```
+
+
+#### 13.1b Exploring All Change Day Period
+lack of clear day and night might be due to how much change is happening durring the ramp period
+```{r 13.1b Exploring All Change Day Period}
+ ggplot(subset(H2Ochemdf[H2Ochemdf$treatment == "allchange", ], 
+               period %in% ("day")), 
+        aes(x=dateTime, y=pH)) + 
+        geom_point(aes(colour=moats, point=)) + 
+        ylim (6.6, 7.8) 
+ 
+```
+
+
+
+# 14.0 Water Chemistry Around Treatment Means: Histogram Evolution to ECDF plots
 
 The following graphs show dissolved oxygen and pH observations. 
 The goal is to describe the time the system spent at different set points.
@@ -944,8 +991,8 @@ Compared to other visualizations that rely on density (like geom_histogram()), t
 ECDF doesn't require any tuning parameters and handles both continuous and categorical variables. 
 
  
-```{r}
-## 13.2 Histogram plot- all moats, all treatments, all periods 
+```{r 14.1 Histogram plot- all moats, all treatments, all periods}
+## 14.1 Histogram plot- all moats, all treatments, all periods 
 
  Cdml %>% ggplot(data=.)+geom_histogram(aes(x=aTemperature), binwidth = .05) + 
                           xlim(5,30) +
@@ -954,10 +1001,9 @@ ECDF doesn't require any tuning parameters and handles both continuous and categ
 
  
  
-##### # 13.2a Histrogram Scaled by Time
+##### # 14.2a Histrogram Scaled by Time
 Section below walks how to quantify each "bin" by the observation period = 6.8minutes
- 
-```{r 13.2a Histrogram Scaled by Time Graphs}
+```{r 14.2a Histrogram Scaled by Time Graphs}
 #find duration of each observations in hours
 
 durObsHours <- 6.8/60
@@ -978,14 +1024,18 @@ plot13.a_temp
 
 ```
  
-```{r 13.2b Histrogram Scaled by Time Graphs plus Y liminator}
+ 
+#### 14.2b Histrogram Scaled by Time Graphs plus Y liminator 
+```{r 14.2b Histrogram Scaled by Time Graphs plus Y liminator}
 
 #just show bins < 12 hours
 plot13.a_temp + ylim(c(0,12))
 
 ```
 
-```{r 13.2c Histrogram Scaled by Time Graphs faceted wrapped}
+
+#### 14.2c Histrogram Scaled by Time Graphs faceted wrapped
+```{r 14.2c Histrogram Scaled by Time Graphs faceted wrapped}
 
 #find duration of each observations in hours
 
@@ -1010,8 +1060,9 @@ plot13.2c_DO
 
 ```
 
-#### 13.3 Cumulative Frequency Distribution
-```{r  13.3a Cumulative Frequency Distribution}
+
+#### 14.3 Cumulative Frequency Distribution
+```{r  14.3a Cumulative Frequency Distribution}
 
 ECFDplot <- ggplot(H2Ochemdf, aes(actualDOmg)) +
             stat_ecdf(aes(colour = moats)) + 
@@ -1023,7 +1074,8 @@ ECFDplot
 ```
 
 
-```{r 13.3b Cumulative Frequency Distribution, facet wrap, geomlines by DO percent}
+#### 14.3b Cumulative Frequency Distribution, facet wrap, geomlines by DO percent
+```{r 14.3b Cumulative Frequency Distribution, facet wrap, geomlines by DO percent}
 ECDFplot2 <- ggplot(H2Ochemdf, aes(percentDO)) +
             stat_ecdf(aes(colour = moats)) + 
             geom_vline(xintercept = c(.6,.7,.8,.9), colour = "red") +
@@ -1034,7 +1086,9 @@ ECDFplot2
 
 ```
 
-```{r 13.3c Cumulative Frequency Distribution MOATs grouped by Treatment Colored by MOATs}
+
+#### 14.3c Cumulative Frequency Distribution MOATs grouped by Treatment Colored by MOATs
+```{r 14.3c Cumulative Frequency Distribution MOATs grouped by Treatment Colored by MOATs}
 
 ECDFplot13.3c <-  ggplot(H2Ochemdf, aes(actualDOmg)) +
                     stat_ecdf(aes(colour = moats)) + 
@@ -1048,9 +1102,9 @@ ECDFplot13.3c
 ```
 
 
-
-```{r 13.3d Actual DOmg ECDF Plot with Summary Table}
-## 13.3d ECDF Plot
+####  14.3d Actual DOmg ECDF Plot with Summary Table
+```{r 14.3d Actual DOmg ECDF Plot with Summary Table}
+## 14.3d ECDF Plot
 
 ECDF_Plot_13.3d <- ggplot(H2Ochemdf, aes(actualDOmg)) +
                 stat_ecdf(aes(colour = moats)) + 
@@ -1060,11 +1114,12 @@ ECDF_Plot_13.3d <- ggplot(H2Ochemdf, aes(actualDOmg)) +
 ECDF_Plot_13.3d
 ```
 
+
 #### 13.4 Creating the Function(s) coolECDF suite
 The cool ECDF function should incorporate the summary statistics and displacy averages
 coolECDF- incorporates aquarium temperature summary statisics 
 DOcoolECDF- will incorporate actual mg of dissolved oxygen summary statistics
-pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed more in chapter 14.
+pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed more in chapter 13.
 ```{r 13.4 Creating functions to incorporate our statisitics- displaying the averages}
 ## 13.4 Creating a function to incorporate our statistics- displaying the averages
 
@@ -1116,10 +1171,11 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
 
 ```
 
-#### 13.4b Aquarium Temperature with Empirical Cumulative Distribution "Cool" function (ECDF) 
 
-```{r 13.4a Using the coolECDF function per treatment & period}
-## 13.4a Using the coolECDF function per treatment & period
+
+#### 14.4b Aquarium Temperature with Empirical Cumulative Distribution "Cool" function (ECDF) 
+```{r 14.4a Using the coolECDF function per treatment & period}
+## 14.4a Using the coolECDF function per treatment & period
 
         cfd.a.d <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "allchange", "day")
         cfd.a.n <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "allchange", "night")
@@ -1128,7 +1184,7 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
         cfd.h.d <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "hightemperature", "day")
         cfd.h.n <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "hightemperature", "night")
         
-## 13.4b Incorporating Grid Arrange to display the ECDF plots        
+## 14.4b Incorporating Grid Arrange to display the ECDF plots        
 # Basic Grid Arrange
 
       grid.arrange(cfd.a.d, cfd.c.d, cfd.h.d, nrow = 1)
@@ -1141,10 +1197,10 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
         
         
 ```
-#### 13.5 Actual Milligrams of Dissolved Oxygen with Empirical Cumulative Distribution "Cool" function (ECDF) 
 
 
-```{r 13.5 Using the Actual Milligrams of Dissolved Oxygen with Empirical Cumulative Distribution "Cool" function (ECDF) }
+#### 14.5 Actual Milligrams of Dissolved Oxygen with Empirical Cumulative Distribution "Cool" function (ECDF) 
+```{r 14.5 Using the Actual Milligrams of Dissolved Oxygen with Empirical Cumulative Distribution "Cool" function (ECDF) }
 
 #*********************************
 ## DO & COOL ECDF function
@@ -1166,7 +1222,7 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
   DO.cfd.hi.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "night")
 
         
-## 13.4b Incorporating Grid Arrange to display the ECDF plots        
+## 14.4b Incorporating Grid Arrange to display the ECDF plots        
 # Basic Grid Arrange
   # Note extra period - the ramp period
 
@@ -1194,15 +1250,15 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
         
     
 ```
-#### 13.6 pH Water Chemistry with Empirical Cumulative Distribution "Cool" function (ECDF) 
 
 
-```{r 13.6 pH Water Chemistry with Empirical Cumulative Distribution "Cool" function (ECDF) }
+#### 14.6 pH Water Chemistry with Empirical Cumulative Distribution "Cool" function (ECDF) 
+```{r 14.6 pH Water Chemistry with Empirical Cumulative Distribution "Cool" function (ECDF) }
 
 #*********************************
 ## pH Water Chemistry & COOL ECDF function
 #********************************* 
-## 13.6a Using the coolECDF function per treatment & period for pH
+## 14.6a Using the coolECDF function per treatment & period for pH
 
   pH.cfd.allchg.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "day",)
   pH.cfd.allchg.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "D2Nramp",)
@@ -1219,7 +1275,7 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
   pH.cfd.hi.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "night")
 
         
-## 13.4b Incorporating Grid Arrange to display the ECDF plots        
+## 14.4b Incorporating Grid Arrange to display the ECDF plots        
 # Basic Grid Arrange
   # Note extra period - the ramp period
 
@@ -1248,55 +1304,26 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
     
 ```
  
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-
  
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-
-  levels(Cdml$treatment)
-  levels(factor(Cdml$period))
-
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
-
  
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-
-      
-      
  
-
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-## 13.5 Investigating tails
-#to look a little more closely at the tails
-#lower 1% 
-      
-lowerTail <- function(p){
-  return(p + ylim(c(0,0.01)))
-}
-
-upperTail <- function(p){
-  return(p + ylim(c(0.99,1.0)))
-}
-
-lowerP <- lapply(ecdfList, lowerTail)
-grid.arrange(grobs = lowerP, ncol=3)
-
-upperP <- lapply(ecdfList, upperTail)
-grid.arrange(grobs = upperP, ncol=3) 
-
- # p + ylim(c(0,0.01))
- # #upper 1%
- # p + ylim(c(0.99,1))
- # 
- # #to look a little more closely at the tails
- # #lower 1% 
- # cfd.a.d + ylim(c(0,0.01))
- # #upper 1%
- # p + ylim(c(0.99,1))
-
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - | 
-## 13.6 Plain time series
-# example plot
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
  ggplot(subset(Cdml[Cdml$treatment == "allchange", ], 
                period %in% ("night")), 
