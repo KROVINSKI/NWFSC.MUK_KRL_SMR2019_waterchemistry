@@ -1093,19 +1093,32 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
 
 ```
 
-
+#### 13.4b Aquarium Temperature with Empirical Cumulative Distribution "Cool" function (ECDF) 
 
 ```{r 13.4a Using the coolECDF function per treatment & period}
 ## 13.4a Using the coolECDF function per treatment & period
 
-        cfd.a.d <- coolECDF(Cdml, Cdml.daynight.summary, "allchange", "day")
-        cfd.a.n <- coolECDF(Cdml, Cdml.daynight.summary, "allchange", "night")
-        cfd.c.d <- coolECDF(Cdml, Cdml.daynight.summary, "current", "day")
-        cfd.c.n <- coolECDF(Cdml, Cdml.daynight.summary, "current", "night")
-        cfd.h.d <- coolECDF(Cdml, Cdml.daynight.summary, "hightemperature", "day")
-        cfd.h.n <- coolECDF(Cdml, Cdml.daynight.summary, "hightemperature", "night")
-```
+        cfd.a.d <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "allchange", "day")
+        cfd.a.n <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "allchange", "night")
+        cfd.c.d <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "current", "day")
+        cfd.c.n <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "current", "night")
+        cfd.h.d <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "hightemperature", "day")
+        cfd.h.n <- coolECDF(Cdml, Cdml.daynight.aTemp.summary, "hightemperature", "night")
+        
+## 13.4b Incorporating Grid Arrange to display the ECDF plots        
+# Basic Grid Arrange
 
+      grid.arrange(cfd.a.d, cfd.c.d, cfd.h.d, nrow = 1)
+ 
+      grid.arrange(cfd.a.n, cfd.c.n, cfd.h.n, nrow = 1) 
+      
+      #make a list of all the plots then pass the list to grid.arrange()
+      ecdfList <- list(cfd.a.d, cfd.c.d, cfd.h.d, cfd.a.n, cfd.c.n, cfd.h.n)
+      grid.arrange(grobs = ecdfList, ncol=3)        
+        
+        
+```
+#### 13.4
 
  
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
@@ -1120,16 +1133,7 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
 
  
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-## 13.4 Incorporating Grid Arrange to display the ECDF plots        
-# Basic Grid Arrange
 
-      grid.arrange(cfd.a.d, cfd.c.d, cfd.h.d, nrow = 1)
- 
-      grid.arrange(cfd.a.n, cfd.c.n, cfd.h.n, nrow = 1) 
-      
-      #make a list of all the plots then pass the list to grid.arrange()
-      ecdfList <- list(cfd.a.d, cfd.c.d, cfd.h.d, cfd.a.n, cfd.c.n, cfd.h.n)
-      grid.arrange(grobs = ecdfList, ncol=3)
       
       
  
