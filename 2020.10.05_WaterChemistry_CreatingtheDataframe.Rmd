@@ -889,6 +889,29 @@ H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period)
 write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.07_H2Ochemdf_daynight_actualDO_summary.csv")
 
 ```
+#### 12.2 pH Day/Night Summary
+```{r 12.2 pH Day/Night Summary}
+
+dim(H2Ochemdf)
+
+H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
+  summarize(sd = sd(pH, na.rm = TRUE), 
+            mean = mean(pH, na.rm = TRUE), 
+            median = median(pH, na.rm = TRUE),
+            IQR = IQR(pH, na.rm = TRUE),
+            n = n(), .groups= "drop_last") %>%
+  
+  mutate(se = sd/sqrt(n)) %>%
+  mutate(ci = se*1.96)
+
+
+write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.08_H2Ochemdf_daynight_pH_summary.csv")
+
+```
+
+
+
+
 
 
 
@@ -1128,19 +1151,19 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
 #********************************* 
 ## 13.5a Using the coolECDF function per treatment & period for DOmg
 
-  DO.cfd.allchg.d <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "allchange", "day",)
-  DO.cfd.allchg.r <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "allchange", "D2Nramp",)
-  DO.cfd.allchg.n <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "allchange", "night")
+  DO.cfd.allchg.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "day",)
+  DO.cfd.allchg.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "D2Nramp",)
+  DO.cfd.allchg.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "night")
         
         
-  DO.cfd.cur.d <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "current", "day")
-  DO.cfd.cur.r <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "current", "D2Nramp")
-  DO.cfd.cur.n <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "current", "night")
+  DO.cfd.cur.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "day")
+  DO.cfd.cur.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "D2Nramp")
+  DO.cfd.cur.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "night")
         
         
-  DO.cfd.hi.d <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "day")
-  DO.cfd.hi.r <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "D2Nramp")
-  DO.cfd.hi.n <- DOcoolECDF(Cdml, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "night")
+  DO.cfd.hi.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "day")
+  DO.cfd.hi.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "D2Nramp")
+  DO.cfd.hi.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "night")
 
         
 ## 13.4b Incorporating Grid Arrange to display the ECDF plots        
@@ -1171,7 +1194,59 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
         
     
 ```
+#### 13.6 pH Water Chemistry with Empirical Cumulative Distribution "Cool" function (ECDF) 
 
+
+```{r 13.6 pH Water Chemistry with Empirical Cumulative Distribution "Cool" function (ECDF) }
+
+#*********************************
+## pH Water Chemistry & COOL ECDF function
+#********************************* 
+## 13.6a Using the coolECDF function per treatment & period for pH
+
+  pH.cfd.allchg.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "day",)
+  pH.cfd.allchg.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "D2Nramp",)
+  pH.cfd.allchg.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "night")
+        
+        
+  pH.cfd.cur.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "day")
+  pH.cfd.cur.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "D2Nramp")
+  pH.cfd.cur.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "night")
+        
+        
+  pH.cfd.hi.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "day")
+  pH.cfd.hi.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "D2Nramp")
+  pH.cfd.hi.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "night")
+
+        
+## 13.4b Incorporating Grid Arrange to display the ECDF plots        
+# Basic Grid Arrange
+  # Note extra period - the ramp period
+
+      grid.arrange(pH.cfd.allchg.d , pH.cfd.cur.d, pH.cfd.hi.d, nrow = 1)
+      
+      grid.arrange(pH.cfd.allchg.r , pH.cfd.cur.r, pH.cfd.hi.r, nrow = 1)
+      
+      grid.arrange(pH.cfd.allchg.n , pH.cfd.cur.n, pH.cfd.hi.n, nrow = 1)
+ 
+      
+      #make a list of all the plots then pass the list to grid.arrange()
+      ecdfList <- list(pH.cfd.allchg.d, 
+                          pH.cfd.allchg.r,
+                            pH.cfd.allchg.n,
+            
+                       pH.cfd.cur.d, 
+                          pH.cfd.cur.r, 
+                            pH.cfd.cur.n, 
+                       
+                       pH.cfd.hi.d, 
+                          pH.cfd.hi.r,
+                            pH.cfd.hi.n
+                                        )
+      grid.arrange(grobs = ecdfList, ncol=3)        
+        
+    
+```
  
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 
