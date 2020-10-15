@@ -49,7 +49,7 @@ Look for all files inside the Water Chemistry folder of the "06. MOATs replicati
 knitr::opts_chunk$set(echo = TRUE)
 
 knitr::opts_knit$set(root.dir =
-                       "/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_WinterStormEvent")
+                       "/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry")
 ```
 
 
@@ -118,12 +118,17 @@ dim(dml)
 ## 2.2 Brining in In-Situ 
 #*********************************
 
+knitr::opts_chunk$set(echo = TRUE)
+
+knitr::opts_knit$set(root.dir =
+                       "/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry")
+
 
 d.temp.insitu <- read.csv(file = "KRL19_insitu_sample_aTemperature_Day.csv", stringsAsFactors = FALSE)
 n.temp.insitu <- read.csv(file = "KRL19_insitu_sample_aTemperature_Night.csv", stringsAsFactors = FALSE)
 
-d.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Day", stringsAsFactors = FALSE)
-n.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night", stringsAsFactors = FALSE)
+day.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Day", stringsAsFactors = FALSE)
+night.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night", stringsAsFactors = FALSE)
 
 
 
