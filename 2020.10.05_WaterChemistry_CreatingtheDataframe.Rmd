@@ -795,9 +795,10 @@ write.csv(H2Ochemdf, "2020.10.05_H2Ochemdf.csv")
 
 
 
-#### 10.1 Filtering Data- dropping levels to clean graphs
-```{r 10.1 Filtering Data- dropping lvls to clean graphs}
-## 10.1) Filtering Data- dropping lvls to clean graphs
+#### 10.1 Filtering Data
+```{r 10.1 Filtering Data}
+#*********************************
+## 10.1) Filtering Data- 
 #*********************************
 
 
@@ -820,17 +821,26 @@ n.temp.insitu = filter(n.temp.insitu,
                          treatment %in% c("current", "allchange", "hightemperature") &
                          period != "other")
 
+
+class(ReferenceTime)
+
 d.DO.insitu = filter(d.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
-                         treatment %in% c("Current", "AllChange", "HighTemp"))
+                         Treatment %in% c("Current", "AllChange", "HighTemp"))
+
+d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
 
 n.DO.insitu = filter(n.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
-                         treatment %in% c("Current", "AllChange", "HighTemp"))
+                         Treatment %in% c("Current", "AllChange", "HighTemp"))
+
+n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
 spec.insitu = filter(spec.insitu,
                        !unit_number %in%  c('3', "4", "5", "11"))
+
+spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
 
 
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
@@ -968,7 +978,7 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.08_H2Ochemdf_daynight_pH_summa
 
 #### 12.3 Summary Table Plots
 ```{r 12.3 Summary Table Plots}
-ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
+ plerts <- ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
             geom_jitter(color = "grey") +
             
             geom_jitter(data = d.DO.insitu, aes(Treatment, actualDOmg)) +
@@ -985,7 +995,7 @@ ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
             facet_wrap(~period) +
             ggtitle("All Treatments, Actual Dissolved Oxygen (mg) Across Periods") +
             theme_bw()
-
+plerts
 
 ```
 
