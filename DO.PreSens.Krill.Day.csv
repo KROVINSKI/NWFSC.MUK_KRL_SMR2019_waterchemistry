@@ -1,4 +1,4 @@
-Date,MOATS,Treatment,Time,Temp,Sensor,Dissolved Oxygen,Period
+Date,MOATS,Treatment,Time,Temp,Sensor,actualDOmg,Period
 10/2/19,1,HighTemp,8:31,12.58,MOATS,5.331,day
 10/2/19,4,Ambient,8:33,10.4,MOATS,9.338,day
 10/2/19,5,Ambient,8:35,10.4,MOATS,9.338,day
