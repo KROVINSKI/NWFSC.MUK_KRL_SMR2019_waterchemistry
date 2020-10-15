@@ -13,7 +13,7 @@ output:
 
 ---
 
-```{r 0.0 Libraries , echo=FALSE, results=FALSE}
+```{r 0.0 Libraries , echo=FALSE, results=FALSE, message=FALSE, warning=FALSE}
 #*********************************
 ##Libraries
 #********************************* 
@@ -989,11 +989,11 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summa
                           aes(x=treatment, y=mean, ymin = mean-ci, ymax = mean+ci),
                           colour = "red") +
             facet_wrap(~period) +
-  
-            # geom_jitter(data = d.DO.insitu, aes(Treatment, actualDOmg),
-            #                     color = "black") +
-            # geom_jitter(data = n.DO.insitu, aes(Treatment, actualDOmg),
-            #                     color = "black") +
+
+            geom_jitter(data = d.DO.insitu, aes(treatment, actualDOmg),
+                                color = "black") +
+            geom_jitter(data = n.DO.insitu, aes(treatment, actualDOmg),
+                                color = "black") +
   
   
             ggtitle("All Treatments, Actual Dissolved Oxygen (mg) Across Periods") +
@@ -1004,7 +1004,7 @@ plerts
 
 ```{r 12.3a Trying to get Jitter Points into the MOATs timeseries for DO plots}
 
-ggplot(H2Ochemdf, aes(x=ObservationDate, 
+ggplot(, aes(x=ObservationDate, 
                                    y=actualDOmg))+
                                 geom_point(aes(colour=treatment, point=)) +
   
@@ -1054,8 +1054,14 @@ ggplot(H2Ochemdf, aes(treatment, pH)) +
 ```
 
 
-```{r}
 
+#### 13.1b Only insitu observations pH plots
+```{r 13.1b Only insitu observations pH plots}
+ggplot(spec.insitu, aes(x=Treatment, 
+                        y=pH))+
+                        geom_point(aes(colour=treatment, point=)) +
+                        ggtitle("pH Across all MOATS")  
+  
 ```
 
 
