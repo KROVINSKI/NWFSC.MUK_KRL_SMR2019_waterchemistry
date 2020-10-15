@@ -829,7 +829,7 @@ n.DO.insitu = filter(n.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
                          treatment %in% c("Current", "AllChange", "HighTemp"))
 
-spec.filtered = filter(spec.insitu,
+spec.insitu = filter(spec.insitu,
                        !unit_number %in%  c('3', "4", "5", "11"))
 
 
