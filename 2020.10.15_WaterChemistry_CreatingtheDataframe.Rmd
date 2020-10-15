@@ -35,6 +35,7 @@ library(reprex)
 library(miniUI)
 library(gridExtra)
 library(wql)
+library(kableExtra)
 ```
 
 
@@ -111,7 +112,6 @@ dim(dml)
 
 
 #### 2.2 In Situ measurements
-
 ```{r 2.2 In Situ measurements}
 
 #*********************************
@@ -362,8 +362,9 @@ ggplot(subset(dml[dml$treatment == "allchange", ],
 
 ```
 
-# 7.) Creating different dataframes
 
+
+# 7.) Creating different dataframes
 #### 7.0 Cdml "Cleaned" dml dataframe is Cdml
 ```{r}
 Cdml <- dml %>% filter(!moats %in% c("M03", "M04", "M05", "M11")) %>%
@@ -376,17 +377,14 @@ Cdml <- dml %>% filter(!moats %in% c("M03", "M04", "M05", "M11")) %>%
 
 Creating the Water Chemistry Dataframe.
 Differences between dataframes outlined in the graphic below:
-
-
-
 ![Different Dataframes' Pipeline](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/dataframe.pipeline.H2Ochemdf.png)
-
 #### Water Chemistry Dataframe Created "H2Ochemdf"
+
+
 
 #### 7.1 Removing the Acclimation Period on H2Ochemdf 
 The acclimation and the time after animals were removed from the system was designated other
 ```{r 7.1 Removing the Acclimation Period }
-
 # Removing "other" period from day and night 
 # not including acclimation period in this investigation
 
@@ -402,6 +400,7 @@ all_salinity$PSU_ObsDate <- ""
 
 all_salinity$Date <- as.POSIXct(all_salinity$Date, format= "%m/%d/%y")
 all_salinity$PSU_ObsDate <- as.Date(all_salinity$Date)
+
 ```
 
 
@@ -426,6 +425,7 @@ H2Ochemdf$PSUavgDaily <- ""
 H2Ochemdf$PSUprevObs <- ""
 H2Ochemdf$assumed_PSU <- ""
 H2Ochemdf$Final_PSU <- ""
+
 ```
 
 
@@ -597,7 +597,7 @@ H2Ochemdf$Final_PSU <- as.numeric(case_when(
 FinalSalinity.by.Day <- ggplot(H2Ochemdf, 
                                aes(x=ObservationDate, y=Final_PSU))+
                                 geom_point(aes(colour=moats, point=)) +
-                                  ggtitle("Salinity Values, all MOATS per Day ")
+                                  ggtitle("Salinity Values, all MOATS (Daily Value)")
 FinalSalinity.by.Day
 ```
 
@@ -826,14 +826,15 @@ class(ReferenceTime)
 
 d.DO.insitu = filter(d.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
-                         Treatment %in% c("Current", "AllChange", "HighTemp"))
+                         treatment %in% c("current", "allchange", "hightemperature"))
 
 d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
 
 n.DO.insitu = filter(n.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
-                         Treatment %in% c("Current", "AllChange", "HighTemp"))
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                            !treatment %in% c("Ambient"))
 
 n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
@@ -868,10 +869,6 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.07_Cdml_daynight_aTemp_summary.c
 
 
 ```
-
-
-
-
 
 
 
@@ -978,9 +975,7 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.08_H2Ochemdf_daynight_pH_summa
 
 
 
-
-
-#### 12.3 Summary Table Plots
+#### 12.3 DO Water Chemistry PlotsSummary Table Plots
 ```{r 12.3 Summary Table Plots}
  plerts <- ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
             geom_jitter(color = "grey") +
@@ -1007,10 +1002,40 @@ plerts
 
 ```
 
+```{r 12.3a Trying to get Jitter Points into the MOATs timeseries for DO plots}
 
-# 13.0 pH Water Chemistry Plots
+ggplot(H2Ochemdf, aes(x=ObservationDate, 
+                                   y=actualDOmg))+
+                                geom_point(aes(colour=treatment, point=)) +
+  
+                                facet_grid(~period) +
+  
+                                geom_jitter(data = d.DO.insitu, aes(Date, actualDOmg),
+                                color = "black") +
+  
+                                geom_jitter(data = n.DO.insitu, aes(Date, actualDOmg),
+                                color = "black") +
+  
+  ggtitle("Assumed Saturation of Dissolved Oxygen Across all MOATS Timeseries")
 
-```{r 12.3 Water Chemistry - pH Summary Table Plots}
+```
+
+#### 12.3b Only insitu observations DO plots
+```{r 12.3b Only insitu observations DO plots}
+ggplot(n.DO.insitu, aes(x=treatment, 
+                        y=actualDOmg))+
+                        geom_point(aes(colour=treatment, point=)) +
+                        ggtitle("Actual mg Dissolved Oxygen Across all MOATS (Night Period) In-situ Measurements")  
+  
+```
+
+
+
+
+
+
+# 13.1 pH Water Chemistry Plots (Summary Table Plots)
+```{r 13.3 Water Chemistry - pH Summary Table Plots}
 ggplot(H2Ochemdf, aes(treatment, pH)) +
             geom_jitter(color = "grey") +
             geom_boxplot(notch = TRUE, outlier.shape = NA, colour = "green") +
@@ -1027,6 +1052,13 @@ ggplot(H2Ochemdf, aes(treatment, pH)) +
 
 
 ```
+
+
+```{r}
+
+```
+
+
 
 
 #### 13.1a Simple Violin Plot for pH
@@ -1377,8 +1409,190 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
         
     
 ```
- 
- 
+
+
+# A. Executive Summary
+![ExecutiveSummary](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/executivesummarygraphic.png)
+
+
+
+#### A.1 Creating the Dataframe
+Creating the Water Chemistry Dataframe.
+Differences between dataframes outlined in the graphic below:
+![Different Dataframes' Pipeline](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/dataframe.pipeline.H2Ochemdf.png)
+
+
+
+#### A.2 Decisions About Salinity
+A mosaic of salinity values were used to update the salinity constants for correct DO measurements.
+Decision needed to determine if enough variation present to continue with "Final_PSU" or return to using the salinity constants
+```{r A.2 Variation in Salinity Across all Replicates}
+FinalSalinity.Daily <- ggplot(H2Ochemdf, 
+                               aes(x=ObservationDate, y=Final_PSU))+
+                                geom_point(aes(colour=moats, point=)) +
+                                  ggtitle("Salinity Values, all MOATS (Daily Value)")
+FinalSalinity.Daily
+```
+
+
+
+The following plots are broken down by treatment to gain more clarity about observed salinity values. 
+##### A.2.1 Variation in Salinity- All Change Treatment
+```{r A.2.1 Variation in Salinity- All Change Treatment}
+plotA.2.1 <- ggplot(subset(H2Ochemdf, 
+               treatment %in% ("allchange")), 
+        aes(x=ObservationDate, y=Final_PSU)) + 
+        geom_point(aes(colour=moats, point=)) +
+        ggtitle("Salinity Variation Across All Change Treatment Replicates")
+plotA.2.1
+```
+
+
+
+##### A.2.2 Variation in Salinity- High Temperature Conditions Treatment
+```{r A.2.2 Variation in Salinity- High Temperature Conditions Treatment}
+plotA.2.2 <- ggplot(subset(H2Ochemdf, 
+               treatment %in% ("hightemperature")), 
+        aes(x=ObservationDate, y=Final_PSU)) + 
+        geom_point(aes(colour=moats, point=)) +
+        ggtitle("Salinity Variation Across High Temperature Conditions Treatment Replicates")
+plotA.2.2
+```
+
+
+
+##### A.2.3 Variation in Salinity- Current Conditions Treatment
+```{r  A.2.3 Variation in Salinity- Current Conditions Treatment}
+plotA.2.3 <- ggplot(subset(H2Ochemdf, 
+               treatment %in% ("current")), 
+        aes(x=ObservationDate, y=Final_PSU)) + 
+        geom_point(aes(colour=moats, point=)) +
+        ggtitle("Salinity Variation Across Current Conditions Treatment Replicates")
+plotA.2.3 
+```
+
+
+
+#### A.3 "Ramp" is an added time period
+When discussing water chemistry the greatest amount of change would occur during the ramp period.
+I didn't want this to affect the system's summary average for DO or pH, Day and Night respectively. 
+Plot below shows the progression of DO from low Day time set points towards the 100% DO saturation.
+
+
+
+#### A.3a Displaying ramp DO activity
+```{r A.3a Displaying ramp DO activity}
+
+
+A3a <- ggplot(f.H2Ochemdf.ramp, aes(x=dateTime, y=percentDOassumpt)) +
+  geom_point(aes(colour=period, point=))   +
+  facet_wrap(~treatment)
+  ggtitle("Assumed Percent DO (All Treatments & All MOATs) Ramping Up From Day to Night")
+
+A3a
+
+```
+
+
+
+#### A.4 Review of How Data were Filtered
+Filtering data focused around throwing out incongruous temperatures and dropping faulty MOATs.
+
+
+
+#### A.4.1 Filtering Data
+```{r A.4.1 Filtering Data}
+#*********************************
+## Filtering Data- 
+#*********************************
+
+
+filteredFrame = filter(H2Ochemdf,
+                       !moats %in% c('M03', "M04", "M05", "M11") & 
+                         (aTemperature>= 5 & aTemperature<=30) &
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                         period != "other")
+
+d.temp.insitu = filter(d.temp.insitu,
+                       !moats %in% c('M03', "M04", "M05", "M11") & 
+                         (aTemperature>= 5 & aTemperature<=30) &
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                         period != "other")
+
+n.temp.insitu = filter(n.temp.insitu,
+                       !moats %in% c('M03', "M04", "M05", "M11") & 
+                         (aTemperature>= 5 & aTemperature<=30) &
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                         period != "other")
+
+class(ReferenceTime)
+
+d.DO.insitu = filter(d.DO.insitu,
+                       !MOATS %in% c('3', "4", "5", "11") & 
+                         treatment %in% c("current", "allchange", "hightemperature"))
+
+d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
+
+n.DO.insitu = filter(n.DO.insitu,
+                       !MOATS %in% c('3', "4", "5", "11") & 
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                            !treatment %in% c("Ambient"))
+
+n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
+
+spec.insitu = filter(spec.insitu,
+                       !unit_number %in%  c('3', "4", "5", "11"))
+
+spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+## 10.1a Dropping levels and factors
+filteredFrame$moats <- droplevels(filteredFrame$moats)
+filteredFrame$treatment <- factor(filteredFrame$treatment)
+
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+
+```
+
+
+#### A.5.1 Summary Tables with boxplots
+The following chunks will show the summary tables' generation and information plotted with boxplots
+Order:
+1. Aquarium Temperatures
+2. Dissolved Oxygen
+3. pH 
+
+
+
+```{r A.5.1 Summary Tables- Aquarium Temperature}
+
+##Summary Table for Aquarium Temperature if further needed for water chemistry statistics
+
+Cdml.daynight.aTemp.summary <- Cdml %>% group_by(treatment, period) %>%
+  summarize(sd = sd(aTemperature, na.rm = TRUE), 
+            mean = mean(aTemperature, na.rm = TRUE), 
+            median = median(aTemperature, na.rm = TRUE),
+            IQR = IQR(aTemperature, na.rm = TRUE),
+            n = n()) %>%
+  mutate(se = sd/sqrt(n)) %>%
+  mutate(ci = se*1.96)
+
+
+write.csv(Cdml.daynight.aTemp.summary, "2020.10.15_Cdml_daynight_aTemp_summary.csv")
+
+kable(Cdml.daynight.aTemp.summary)
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
