@@ -1100,9 +1100,9 @@ ECDF doesn't require any tuning parameters and handles both continuous and categ
 ```{r 14.1 Histogram plot- all moats, all treatments, all periods}
 ## 14.1 Histogram plot- all moats, all treatments, all periods 
 
- Cdml %>% ggplot(data=.)+geom_histogram(aes(x=aTemperature), binwidth = .05) + 
-                          xlim(5,30) +
-                          ylim(0, 10000)
+ # Cdml %>% ggplot(data=.)+geom_histogram(aes(x=aTemperature), binwidth = .05) + 
+ #                          xlim(5,30) +
+ #                          ylim(0, 10000)
 ```
 
  
@@ -1704,7 +1704,15 @@ ggplot(H2Ochemdf, aes(treatment, pH)) +
 
 
 
+Where I still need help
 
+Getting my jitter plots to work
+understanding the time format from the SPEC files
+
+![SPECdemicalTime](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/helpwithspecinsitu.png)
+
+
+how to plot the remaining ECDF plots
 
 
 
