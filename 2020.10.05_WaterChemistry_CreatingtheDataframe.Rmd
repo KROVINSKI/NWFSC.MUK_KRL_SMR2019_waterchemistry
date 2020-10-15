@@ -110,6 +110,31 @@ dim(dml)
 
 
 
+#### 2.2 In Situ measurements
+
+```{r 2.2 In Situ measurements}
+
+#*********************************
+## 2.2 Brining in In-Situ 
+#*********************************
+
+
+d.temp.insitu <- read.csv(file = "KRL19_insitu_sample_aTemperature_Day.csv", stringsAsFactors = FALSE)
+n.temp.insitu <- read.csv(file = "KRL19_insitu_sample_aTemperature_Night.csv", stringsAsFactors = FALSE)
+
+d.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Day", stringsAsFactors = FALSE)
+n.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night", stringsAsFactors = FALSE)
+
+
+
+```
+
+
+
+
+
+
+
 # 3.0) Reformatting variables/vectors (Factors)
 Changing MOATs to Factors for the 13 different MOATs- these will be the discrete units for follow analysis
 ```{r Reformatting variables/vectors (Factors), ECHO= FALSE, message=FALSE, warning=FALSE}
@@ -908,8 +933,6 @@ H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
 write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.08_H2Ochemdf_daynight_pH_summary.csv")
 
 ```
-
-
 
 
 
