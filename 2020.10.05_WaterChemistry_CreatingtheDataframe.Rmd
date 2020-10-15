@@ -127,10 +127,11 @@ knitr::opts_knit$set(root.dir =
 d.temp.insitu <- read.csv(file = "KRL19_insitu_sample_aTemperature_Day.csv", stringsAsFactors = FALSE)
 n.temp.insitu <- read.csv(file = "KRL19_insitu_sample_aTemperature_Night.csv", stringsAsFactors = FALSE)
 
-d.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Day", stringsAsFactors = FALSE)
-n.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night", stringsAsFactors = FALSE)
+d.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Day.csv", stringsAsFactors = FALSE)
+n.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night.csv", stringsAsFactors = FALSE)
 
 
+spec.insitu <- read.csv(file = "2020.10.14_SpecData.csv", stringsAsFactors = FALSE)
 
 ```
 
@@ -806,6 +807,32 @@ filteredFrame = filter(H2Ochemdf,
                          treatment %in% c("current", "allchange", "hightemperature") &
                          period != "other")
 
+
+d.temp.insitu = filter(d.temp.insitu,
+                       !moats %in% c('M03', "M04", "M05", "M11") & 
+                         (aTemperature>= 5 & aTemperature<=30) &
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                         period != "other")
+
+n.temp.insitu = filter(n.temp.insitu,
+                       !moats %in% c('M03', "M04", "M05", "M11") & 
+                         (aTemperature>= 5 & aTemperature<=30) &
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                         period != "other")
+
+d.DO.insitu = filter(d.DO.insitu,
+                       !MOATS %in% c('3', "4", "5", "11") & 
+                         treatment %in% c("Current", "AllChange", "HighTemp"))
+
+
+n.DO.insitu = filter(n.DO.insitu,
+                       !MOATS %in% c('3', "4", "5", "11") & 
+                         treatment %in% c("Current", "AllChange", "HighTemp"))
+
+spec.filtered = filter(spec.insitu,
+                       !unit_number %in%  c('3', "4", "5", "11"))
+
+
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 
 ## 10.1a Dropping levels and factors
@@ -943,6 +970,10 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.08_H2Ochemdf_daynight_pH_summa
 ```{r 12.3 Summary Table Plots}
 ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
             geom_jitter(color = "grey") +
+            
+            geom_jitter(data = d.DO.insitu, aes(Treatment, actualDOmg)) +
+            geom_jitter(data = n.DO.insitu, aes(Treatment, actualDOmg)) +
+            
             geom_boxplot(notch = TRUE, outlier.shape = NA, colour = "green") +
             geom_point(data = H2Ochemdf.daynight.actualDO.summary, aes(x=treatment, y=mean), size=5, color = "purple") +
             geom_errorbar(data =H2Ochemdf.daynight.actualDO.summary,
