@@ -136,10 +136,6 @@ night.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night", stringsAsFactors = 
 
 
 
-
-
-
-
 # 3.0) Reformatting variables/vectors (Factors)
 Changing MOATs to Factors for the 13 different MOATs- these will be the discrete units for follow analysis
 ```{r Reformatting variables/vectors (Factors), ECHO= FALSE, message=FALSE, warning=FALSE}
