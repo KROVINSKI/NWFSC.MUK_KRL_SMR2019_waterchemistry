@@ -950,7 +950,7 @@ H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period)
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.07_H2Ochemdf_daynight_actualDO_summary.csv")
+write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.15_H2Ochemdf_daynight_actualDO_summary.csv")
 
 ```
 #### 12.2 pH Day/Night Summary
@@ -969,7 +969,7 @@ H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.08_H2Ochemdf_daynight_pH_summary.csv")
+write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summary.csv")
 
 ```
 
@@ -990,10 +990,10 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.08_H2Ochemdf_daynight_pH_summa
                           colour = "red") +
             facet_wrap(~period) +
   
-            geom_jitter(data = d.DO.insitu, aes(Treatment, actualDOmg),
-                                color = "black") +
-            geom_jitter(data = n.DO.insitu, aes(Treatment, actualDOmg),
-                                color = "black") +
+            # geom_jitter(data = d.DO.insitu, aes(Treatment, actualDOmg),
+            #                     color = "black") +
+            # geom_jitter(data = n.DO.insitu, aes(Treatment, actualDOmg),
+            #                     color = "black") +
   
   
             ggtitle("All Treatments, Actual Dissolved Oxygen (mg) Across Periods") +
@@ -1564,7 +1564,7 @@ Order:
 3. pH 
 
 
-
+#### A.5.1 Summary Tables- Aquarium Temperature
 ```{r A.5.1 Summary Tables- Aquarium Temperature}
 
 ##Summary Table for Aquarium Temperature if further needed for water chemistry statistics
@@ -1583,6 +1583,136 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.15_Cdml_daynight_aTemp_summary.c
 
 kable(Cdml.daynight.aTemp.summary)
 ```
+
+#### A.5.2 Summary Tables- Aquarium Temperature-  aTemperature Plot with Summary Table Data
+```{r A.5.2 Summary Tables- Aquarium Temperature-  aTemperature Plot with Summary Table Data}
+ggplot(Cdml, aes(treatment, aTemperature)) +
+            geom_jitter(color = "grey") +
+            # geom_jitter(data = d.temp.insitu, aes(treatment, aTemperature)) +
+            # geom_jitter(data = n.temp.insitu, aes(treatment, aTemperature)) +
+            # geom_jitter(aes(colour = black)) +
+            geom_boxplot(notch = TRUE, outlier.shape = NA, colour = "green") +
+            geom_point(data = Cdml.daynight.aTemp.summary, aes(x=treatment, y=mean), size=5, color = "purple") + 
+            geom_errorbar(data = Cdml.daynight.aTemp.summary, 
+                          aes(x=treatment, y=mean, ymin = mean-sd, ymax = mean+sd), 
+                          color = "blue") +
+            geom_errorbar(data = Cdml.daynight.aTemp.summary,
+                          aes(x=treatment, y=mean, ymin = mean-ci, ymax = mean+ci),
+                          colour = "red") +
+            facet_wrap(~period) +
+            ggtitle("All Treatments, Aquarium Temperature Summarized") +
+            theme_bw() 
+```
+
+
+
+#### A.5.3 Summary Tables-DO Day/Night Summary
+```{r A.5.3 Summary Tables-DO Day/Night Summary}
+
+dim(H2Ochemdf)
+
+H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
+  summarize(sd = sd(actualDOmg, na.rm = TRUE), 
+            mean = mean(actualDOmg, na.rm = TRUE), 
+            median = median(actualDOmg, na.rm = TRUE),
+            IQR = IQR(actualDOmg, na.rm = TRUE),
+            n = n(), .groups= "drop_last") %>%
+  
+  mutate(se = sd/sqrt(n)) %>%
+  mutate(ci = se*1.96)
+
+
+write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.15_H2Ochemdf_daynight_actualDO_summary.csv")
+
+kable(H2Ochemdf.daynight.actualDO.summary)
+
+```
+
+
+
+#### A.5.3 Summary Tables-DO Day/Night Summary - Summary Table Plots
+```{r A.5.3 Summary Tables-DO Day/Night Summary - Summary Table Plots}
+ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
+            geom_jitter(color = "grey") +
+            
+            geom_boxplot(notch = TRUE, outlier.shape = NA, colour = "green") +
+            geom_point(data = H2Ochemdf.daynight.actualDO.summary, aes(x=treatment, y=mean), size=5, color = "purple") +
+            geom_errorbar(data =H2Ochemdf.daynight.actualDO.summary,
+                          aes(x=treatment, y=mean, ymin = mean-sd, ymax = mean+sd),
+                          color = "blue") +
+            geom_errorbar(data = H2Ochemdf.daynight.actualDO.summary,
+                          aes(x=treatment, y=mean, ymin = mean-ci, ymax = mean+ci),
+                          colour = "red") +
+            facet_wrap(~period) +
+  
+            # geom_jitter(data = d.DO.insitu, aes(Treatment, actualDOmg),
+            #                     color = "black") +
+            # geom_jitter(data = n.DO.insitu, aes(Treatment, actualDOmg),
+            #                     color = "black") +
+  
+  
+            ggtitle("All Treatments, Actual Dissolved Oxygen (mg) Across Periods") +
+            theme_bw()
+
+
+```
+
+
+
+#### A.5.4 Summary Tables-pH Day/Night Summary
+```{r A.5.4 Summary Tables-pH Day/Night Summary}
+
+dim(H2Ochemdf)
+
+H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
+  summarize(sd = sd(pH, na.rm = TRUE), 
+            mean = mean(pH, na.rm = TRUE), 
+            median = median(pH, na.rm = TRUE),
+            IQR = IQR(pH, na.rm = TRUE),
+            n = n(), .groups= "drop_last") %>%
+  
+  mutate(se = sd/sqrt(n)) %>%
+  mutate(ci = se*1.96)
+
+
+write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summary.csv")
+
+kable(H2Ochemdf.daynight.pH.summary)
+
+```
+
+
+
+#### A.5.4a Summary Tables-pH Day/Night Summary (Summary Table Plots)
+```{r A.5.4a Summary Tables-pH Day/Night Summary (Summary Table Plots)}
+ggplot(H2Ochemdf, aes(treatment, pH)) +
+            geom_jitter(color = "grey") +
+            geom_boxplot(notch = TRUE, outlier.shape = NA, colour = "green") +
+            geom_point(data = H2Ochemdf.daynight.pH.summary, aes(x=treatment, y=mean), size=5, color = "purple") +
+            geom_errorbar(data =H2Ochemdf.daynight.pH.summary,
+                          aes(x=treatment, y=mean, ymin = mean-sd, ymax = mean+sd),
+                          color = "blue") +
+            geom_errorbar(data = H2Ochemdf.daynight.pH.summary,
+                          aes(x=treatment, y=mean, ymin = mean-ci, ymax = mean+ci),
+                          colour = "red") +
+            facet_wrap(~period) +
+            ggtitle("All Treatments, Water Chemistry pH, Across Periods") +
+            theme_bw()
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
