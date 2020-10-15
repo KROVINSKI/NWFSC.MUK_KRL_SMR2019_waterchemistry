@@ -1010,12 +1010,12 @@ ggplot(H2Ochemdf, aes(x=ObservationDate,
   
                                 facet_grid(~period) +
   
-                                geom_jitter(data = d.DO.insitu, aes(Date, actualDOmg),
-                                color = "black") +
-  
-                                geom_jitter(data = n.DO.insitu, aes(Date, actualDOmg),
-                                color = "black") +
-  
+                                # geom_jitter(data = d.DO.insitu, aes(Date, actualDOmg),
+                                # color = "black") +
+                                # 
+                                # geom_jitter(data = n.DO.insitu, aes(Date, actualDOmg),
+                                # color = "black") +
+                                # 
   ggtitle("Assumed Saturation of Dissolved Oxygen Across all MOATS Timeseries")
 
 ```
@@ -1198,7 +1198,7 @@ ECDFplot2
 
 ECDFplot13.3c <-  ggplot(H2Ochemdf, aes(actualDOmg)) +
                     stat_ecdf(aes(colour = moats)) + 
-                    geom_vline(xintercept = H2Ochemdf.daynight.summary$mean, colour = "red") +
+                    geom_vline(xintercept = H2Ochemdf.daynight.actualDO.summary$mean, colour = "red") +
                     facet_wrap(vars(treatment, period), ncol = 2, scales = "fixed")  +
                     theme_bw()
 ECDFplot13.3c
@@ -1313,47 +1313,47 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
 #********************************* 
 ## 13.5a Using the coolECDF function per treatment & period for DOmg
 
-  DO.cfd.allchg.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "day",)
-  DO.cfd.allchg.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "D2Nramp",)
-  DO.cfd.allchg.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "night")
-        
-        
-  DO.cfd.cur.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "day")
-  DO.cfd.cur.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "D2Nramp")
-  DO.cfd.cur.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "night")
-        
-        
-  DO.cfd.hi.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "day")
-  DO.cfd.hi.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "D2Nramp")
-  DO.cfd.hi.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "night")
-
-        
-## 14.4b Incorporating Grid Arrange to display the ECDF plots        
-# Basic Grid Arrange
-  # Note extra period - the ramp period
-
-      grid.arrange(DO.cfd.allchg.d , DO.cfd.cur.d, DO.cfd.hi.d, nrow = 1)
-      
-      grid.arrange(DO.cfd.allchg.r , DO.cfd.cur.r, DO.cfd.hi.r, nrow = 1)
-      
-      grid.arrange(DO.cfd.allchg.n , DO.cfd.cur.n, DO.cfd.hi.n, nrow = 1)
- 
-      
-      #make a list of all the plots then pass the list to grid.arrange()
-      ecdfList <- list(DO.cfd.allchg.d, 
-                          DO.cfd.allchg.r,
-                            DO.cfd.allchg.n,
-            
-                       DO.cfd.cur.d, 
-                          DO.cfd.cur.r, 
-                            DO.cfd.cur.n, 
-                       
-                       DO.cfd.hi.d, 
-                          DO.cfd.hi.r,
-                            DO.cfd.hi.n
-                                        )
-      grid.arrange(grobs = ecdfList, ncol=3)        
-        
+#   DO.cfd.allchg.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "day",)
+#   DO.cfd.allchg.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "D2Nramp",)
+#   DO.cfd.allchg.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "allchange", "night")
+#         
+#         
+#   DO.cfd.cur.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "day")
+#   DO.cfd.cur.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "D2Nramp")
+#   DO.cfd.cur.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "current", "night")
+#         
+#         
+#   DO.cfd.hi.d <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "day")
+#   DO.cfd.hi.r <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "D2Nramp")
+#   DO.cfd.hi.n <- DOcoolECDF(H2Ochemdf, H2Ochemdf.daynight.actualDO.summary, "hightemperature", "night")
+# 
+#         
+# ## 14.4b Incorporating Grid Arrange to display the ECDF plots        
+# # Basic Grid Arrange
+#   # Note extra period - the ramp period
+# 
+#       grid.arrange(DO.cfd.allchg.d , DO.cfd.cur.d, DO.cfd.hi.d, nrow = 1)
+#       
+#       grid.arrange(DO.cfd.allchg.r , DO.cfd.cur.r, DO.cfd.hi.r, nrow = 1)
+#       
+#       grid.arrange(DO.cfd.allchg.n , DO.cfd.cur.n, DO.cfd.hi.n, nrow = 1)
+#  
+#       
+#       #make a list of all the plots then pass the list to grid.arrange()
+#       ecdfList <- list(DO.cfd.allchg.d, 
+#                           DO.cfd.allchg.r,
+#                             DO.cfd.allchg.n,
+#             
+#                        DO.cfd.cur.d, 
+#                           DO.cfd.cur.r, 
+#                             DO.cfd.cur.n, 
+#                        
+#                        DO.cfd.hi.d, 
+#                           DO.cfd.hi.r,
+#                             DO.cfd.hi.n
+#                                         )
+#       grid.arrange(grobs = ecdfList, ncol=3)        
+#         
     
 ```
 
@@ -1366,48 +1366,48 @@ pHcoolECDF- will incorporate pH summary statistics. pH measurements discussed mo
 #********************************* 
 ## 14.6a Using the coolECDF function per treatment & period for pH
 
-  pH.cfd.allchg.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "day",)
-  pH.cfd.allchg.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "D2Nramp",)
-  pH.cfd.allchg.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "night")
-        
-        
-  pH.cfd.cur.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "day")
-  pH.cfd.cur.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "D2Nramp")
-  pH.cfd.cur.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "night")
-        
-        
-  pH.cfd.hi.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "day")
-  pH.cfd.hi.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "D2Nramp")
-  pH.cfd.hi.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "night")
-
-        
-## 14.4b Incorporating Grid Arrange to display the ECDF plots        
-# Basic Grid Arrange
-  # Note extra period - the ramp period
-
-      grid.arrange(pH.cfd.allchg.d , pH.cfd.cur.d, pH.cfd.hi.d, nrow = 1)
-      
-      grid.arrange(pH.cfd.allchg.r , pH.cfd.cur.r, pH.cfd.hi.r, nrow = 1)
-      
-      grid.arrange(pH.cfd.allchg.n , pH.cfd.cur.n, pH.cfd.hi.n, nrow = 1)
- 
-      
-      #make a list of all the plots then pass the list to grid.arrange()
-      ecdfList <- list(pH.cfd.allchg.d, 
-                          pH.cfd.allchg.r,
-                            pH.cfd.allchg.n,
-            
-                       pH.cfd.cur.d, 
-                          pH.cfd.cur.r, 
-                            pH.cfd.cur.n, 
-                       
-                       pH.cfd.hi.d, 
-                          pH.cfd.hi.r,
-                            pH.cfd.hi.n
-                                        )
-      grid.arrange(grobs = ecdfList, ncol=3)        
-        
-    
+#   pH.cfd.allchg.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "day",)
+#   pH.cfd.allchg.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "D2Nramp",)
+#   pH.cfd.allchg.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "allchange", "night")
+#         
+#         
+#   pH.cfd.cur.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "day")
+#   pH.cfd.cur.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "D2Nramp")
+#   pH.cfd.cur.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "current", "night")
+#         
+#         
+#   pH.cfd.hi.d <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "day")
+#   pH.cfd.hi.r <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "D2Nramp")
+#   pH.cfd.hi.n <- pHcoolECDF(H2Ochemdf, H2Ochemdf.daynight.pH.summary, "hightemperature", "night")
+# 
+#         
+# ## 14.4b Incorporating Grid Arrange to display the ECDF plots        
+# # Basic Grid Arrange
+#   # Note extra period - the ramp period
+# 
+#       grid.arrange(pH.cfd.allchg.d , pH.cfd.cur.d, pH.cfd.hi.d, nrow = 1)
+#       
+#       grid.arrange(pH.cfd.allchg.r , pH.cfd.cur.r, pH.cfd.hi.r, nrow = 1)
+#       
+#       grid.arrange(pH.cfd.allchg.n , pH.cfd.cur.n, pH.cfd.hi.n, nrow = 1)
+#  
+#       
+#       #make a list of all the plots then pass the list to grid.arrange()
+#       ecdfList <- list(pH.cfd.allchg.d, 
+#                           pH.cfd.allchg.r,
+#                             pH.cfd.allchg.n,
+#             
+#                        pH.cfd.cur.d, 
+#                           pH.cfd.cur.r, 
+#                             pH.cfd.cur.n, 
+#                        
+#                        pH.cfd.hi.d, 
+#                           pH.cfd.hi.r,
+#                             pH.cfd.hi.n
+#                                         )
+#       grid.arrange(grobs = ecdfList, ncol=3)        
+#         
+#     
 ```
 
 
