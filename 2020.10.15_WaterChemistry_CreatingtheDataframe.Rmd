@@ -824,26 +824,6 @@ n.temp.insitu = filter(n.temp.insitu,
 
 class(ReferenceTime)
 
-d.DO.insitu = filter(d.DO.insitu,
-                       !MOATS %in% c('3', "4", "5", "11") & 
-                         treatment %in% c("current", "allchange", "hightemperature"))
-
-d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
-
-
-n.DO.insitu = filter(n.DO.insitu,
-                       !MOATS %in% c('3', "4", "5", "11") & 
-                         treatment %in% c("current", "allchange", "hightemperature") &
-                            !treatment %in% c("Ambient"))
-
-n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
-
-spec.insitu = filter(spec.insitu,
-                       !unit_number %in%  c('3', "4", "5", "11"))
-
-spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
-
-
 #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 
 ## 10.1a Dropping levels and factors
@@ -869,6 +849,43 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.07_Cdml_daynight_aTemp_summary.c
 
 
 ```
+
+
+#### 10.2 Filtering and Modifying Data for insitu measurements
+```{r}
+d.DO.insitu = filter(d.DO.insitu,
+                       !MOATS %in% c('3', "4", "5", "11") & 
+                         treatment %in% c("current", "allchange", "hightemperature"))
+
+d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
+
+
+n.DO.insitu = filter(n.DO.insitu,
+                       !MOATS %in% c('3', "4", "5", "11") & 
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                            !treatment %in% c("Ambient"))
+
+n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
+
+
+spec.insitu = filter(spec.insitu,
+                       !unit_number %in%  c('3', "4", "5", "11"))
+
+spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
+```
+
+
+
+#### 10.3 Filtering the DO measurements to clean up Day/Night Periods
+```{r}
+
+dml$period <- ""
+
+
+```
+
+
+
 
 
 
@@ -1587,7 +1604,7 @@ Cdml.daynight.aTemp.summary <- Cdml %>% group_by(treatment, period) %>%
 
 write.csv(Cdml.daynight.aTemp.summary, "2020.10.15_Cdml_daynight_aTemp_summary.csv")
 
-kable(Cdml.daynight.aTemp.summary)
+kable(Cdml.daynight.aTemp.summary, digits = 2)
 ```
 
 #### A.5.2 Summary Tables- Aquarium Temperature-  aTemperature Plot with Summary Table Data
@@ -1630,7 +1647,7 @@ H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period)
 
 write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.15_H2Ochemdf_daynight_actualDO_summary.csv")
 
-kable(H2Ochemdf.daynight.actualDO.summary)
+kable(H2Ochemdf.daynight.actualDO.summary, digits=2)
 
 ```
 
@@ -1683,7 +1700,7 @@ H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
 
 write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summary.csv")
 
-kable(H2Ochemdf.daynight.pH.summary)
+kable(H2Ochemdf.daynight.pH.summary, digits=2)
 
 ```
 
