@@ -13,6 +13,12 @@ output:
 
 ---
 
+```{r knitr::opts_chunk$set(warning = FALSE, message = FALSE)}
+
+```
+
+
+
 ```{r 0.0 Libraries , echo=FALSE, results=FALSE, message=FALSE, warning=FALSE}
 #*********************************
 ##Libraries
@@ -844,7 +850,7 @@ Cdml.daynight.aTemp.summary <- Cdml %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-write.csv(Cdml.daynight.aTemp.summary, "2020.10.07_Cdml_daynight_aTemp_summary.csv")
+write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.csv")
 
 
 
@@ -878,6 +884,7 @@ spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
 
 #### 10.3 Filtering the DO measurements to clean up Day/Night Periods
 ```{r}
+
 
 dml$period <- ""
 
@@ -1012,6 +1019,7 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summa
             geom_jitter(data = n.DO.insitu, aes(treatment, actualDOmg),
                                 color = "black") +
   
+              facet_wrap(~period) +
   
             ggtitle("All Treatments, Actual Dissolved Oxygen (mg) Across Periods") +
             theme_bw()
