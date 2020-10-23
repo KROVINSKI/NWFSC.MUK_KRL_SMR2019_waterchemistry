@@ -891,9 +891,13 @@ dim(n.DO.insitu)
 DO.insitu <- merge(d.DO.insitu, n.DO.insitu,by="dateTime")
 
 
+DO.insitu.1 <- merge(d.DO.insitu, n.DO.insitu, by = "dateTime", all = TRUE)
+
+#DO.insitu.2 <- merge(d.DO.insitu, n.DO.insitu, by.x = "dateTime", by.y = "Date").
+#DOinsitu.3 <- rbind(d.DO.insitu, n.DO.insitu)
+
 
 ```
-
 
 
 
@@ -904,7 +908,7 @@ DO.insitu <- merge(d.DO.insitu, n.DO.insitu,by="dateTime")
 dml$period <- ""
 
 
-```
+][```
 
 
 
