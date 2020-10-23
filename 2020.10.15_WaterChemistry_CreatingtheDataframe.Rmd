@@ -37,6 +37,7 @@ library(violinmplot)
 library(vioplot)
 library(yarrr)
 library(datapasta)
+library(lubridate)
 library(reprex)
 library(miniUI)
 library(gridExtra)
@@ -871,6 +872,44 @@ dn.DO.insitu <- filter(dn.DO.insitu,
 
 dn.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", dn.DO.insitu$Date, dn.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
+dn.DO.insitu$period <-""
+
+dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
+  (ObservationDate >= "2019-09-23") 
+  & (ObservationDate <="2019-10-05") 
+  & (ObservationTime >= "12:00:00") 
+  & (ObservationTime <="21:00:00") ~"night",
+  
+  (ObservationDate >= "2019-10-05")
+  & (ObservationDate <= "2019-10-30")
+  & (ObservationTime >= "12:31:00") 
+  & (ObservationTime <="21:00:00") ~"night",
+  
+  (ObservationDate >= "2019-09-23") 
+  & (ObservationDate <="2019-10-05")
+  & ((ObservationTime >= "21:01:00") 
+     | (ObservationTime <="11:29:00")) ~"day",
+  
+  (ObservationDate >= "2019-10-05")
+  & (ObservationDate <= "2019-10-30")
+  & ((ObservationTime >= "21:01:00")
+     | (ObservationTime <= "12:01:00")) ~"day",
+  
+  (ObservationDate >= "2019-09-23") 
+  & (ObservationDate <="2019-10-05")
+  & ((ObservationTime >= "11:30:00") 
+     | (ObservationTime <="12:00:00")) ~"D2Nramp",
+  
+  (ObservationDate >= "2019-10-05")
+  & (ObservationDate <= "2019-10-30")
+  & ((ObservationTime >= "12:01:00")
+     | (ObservationTime <= "12:30:00")) ~"D2Nramp",
+
+  
+  TRUE ~"other"
+)
+
+) 
 
 
 # d.DO.insitu = filter(d.DO.insitu,
@@ -888,16 +927,7 @@ dn.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", dn.DO.insitu$Date, dn.DO.in
 # n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
 
-spec.insitu = filter(spec.insitu,
-                       !unit_number %in%  c('3', "4", "5", "11"))
 
-spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
-
-spec.insitu$ObservationTime <- ""
-
-#spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu() + 0.8541667), "%H:%M", tz="UTC")
-spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$time, "%H:%M", tz="UTC")
-                                      
 
 ```
 
@@ -917,6 +947,61 @@ DO.insitu.1 <- merge(d.DO.insitu, n.DO.insitu, by = "dateTime", all = TRUE)
 #DO.insitu.2 <- merge(d.DO.insitu, n.DO.insitu, by.x = "dateTime", by.y = "Date").
 #DOinsitu.3 <- rbind(d.DO.insitu, n.DO.insitu)
 
+
+```
+
+
+
+#### 10.2b SPEC insitu data 
+```{r 10.2b SPEC insitu data }
+
+
+dim(spec.insitu)
+
+signif(spec.insitu$time, digits = 6)
+signif(spec.insitu$period, digits = 4)
+
+spec.insitu = filter(spec.insitu,
+                       !unit_number %in%  c('3', "4", "5", "11"))
+
+spec.insitu <- spec.insitu %>% mutate(newtime=mdy_hms(paste0(date, "_", seconds_to_period(time*seconds.in.a.day)))) 
+
+spec.insitu$newtime <- ""
+
+seconds_to_period(spec.insitu$time*seconds.in.a.day)
+
+spec.insitu <- spec.insitu %>% mutate(rawtime=seconds_to_period(time*seconds.in.a.day))
+spec.insitu <-  spec.insitu %>% mutate(newertime=mdy_hms(paste0(date, "_", rawtime)))
+
+# 
+# spec.insitu$newtime <- mdy_hms(paste0)
+
+spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
+
+spec.insitu$ObservationTime <- ""
+
+seconds.in.a.day <- 86400
+spec.insitu$ObservationTime <- spec.insitu$time*86400
+
+partialtime <- spec.insitu %>% mutate(period=seconds_to_period(ObservationTime)) %>% mutate(time_of_day=sprintf("%02i:%02i", hour(period), minute(period)))
+
+partialtime [, time_of_day := sprintf("%02i:%02i", hour(period), minute(period))]
+# partialtime <- spec.insitu[, period:= seconds_to_period(ObservationTime)]    
+
+#spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu() + 0.8541667), "%H:%M", tz="UTC")
+spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$time, "%H:%M", tz="UTC")
+                                      
+# spec.insitu$ObservationTime <- strftime(spec.insitu, format = "%STR 32460", tz = "", usetz = FALSE,                                   strftime(32460, format = "%S")
+#                                         
+                                        
+spec.insitu$ObservationTime <- strftime(strftime(32460, format = "%S"))
+# # create sample data
+# dt <- data.table(seconds_of_day = 60 * 15 * seq(11, 77, 11))
+# # convert seconds to period
+# dt[, period := seconds_to_period(seconds_of_day)]
+# # convert period to time of day _as character string_ !
+# dt[, time_of_day := sprintf("%02i:%02i", hour(period), minute(period))]
+# # d
 
 ```
 
