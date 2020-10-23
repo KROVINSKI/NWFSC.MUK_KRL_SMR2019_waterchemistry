@@ -862,8 +862,10 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.c
 #### 10.2 Filtering and Modifying Data for insitu measurements
 ```{r 10.2 Filtering and Modifying Data for insitu measurements}
 
-
-
+dn.DO.insitu$ObservationDate <- ""
+dn.DO.insitu$ObservationTime <- ""
+dn.DO.insitu$ObservationDate <- as.Date(dn.DO.insitu$dateTime)
+dn.DO.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
 
 dn.DO.insitu <- filter(dn.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
@@ -936,16 +938,16 @@ dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
 #### 10.2a Bringing Day and Night Datasets Together
 ```{r}
 
-dim(d.DO.insitu)
-dim(n.DO.insitu)
-
-DO.insitu <- merge(d.DO.insitu, n.DO.insitu,by="dateTime")
-
-
-DO.insitu.1 <- merge(d.DO.insitu, n.DO.insitu, by = "dateTime", all = TRUE)
-
-#DO.insitu.2 <- merge(d.DO.insitu, n.DO.insitu, by.x = "dateTime", by.y = "Date").
-#DOinsitu.3 <- rbind(d.DO.insitu, n.DO.insitu)
+# dim(d.DO.insitu)
+# dim(n.DO.insitu)
+# 
+# DO.insitu <- merge(d.DO.insitu, n.DO.insitu,by="dateTime")
+# 
+# 
+# DO.insitu.1 <- merge(d.DO.insitu, n.DO.insitu, by = "dateTime", all = TRUE)
+# 
+# #DO.insitu.2 <- merge(d.DO.insitu, n.DO.insitu, by.x = "dateTime", by.y = "Date").
+# #DOinsitu.3 <- rbind(d.DO.insitu, n.DO.insitu)
 
 
 ```
