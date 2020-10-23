@@ -860,6 +860,15 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.c
 
 #### 10.2 Filtering and Modifying Data for insitu measurements
 ```{r 10.2 Filtering and Modifying Data for insitu measurements}
+
+
+
+
+dn.DO.insitu <- 
+
+
+
+
 d.DO.insitu = filter(d.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
                          treatment %in% c("current", "allchange", "hightemperature"))
