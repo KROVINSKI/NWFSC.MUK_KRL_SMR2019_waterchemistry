@@ -893,8 +893,11 @@ spec.insitu = filter(spec.insitu,
 
 spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
 
+spec.insitu$ObservationTime <- ""
 
-
+#spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu() + 0.8541667), "%H:%M", tz="UTC")
+spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$time, "%H:%M", tz="UTC")
+                                      
 
 ```
 
