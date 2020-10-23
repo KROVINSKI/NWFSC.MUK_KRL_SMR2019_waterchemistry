@@ -864,30 +864,38 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.c
 
 
 
-dn.DO.insitu <- 
-
-
-
-
-d.DO.insitu = filter(d.DO.insitu,
-                       !MOATS %in% c('3', "4", "5", "11") & 
-                         treatment %in% c("current", "allchange", "hightemperature"))
-
-d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
-
-
-n.DO.insitu = filter(n.DO.insitu,
+dn.DO.insitu <- filter(dn.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
                          treatment %in% c("current", "allchange", "hightemperature") &
                             !treatment %in% c("Ambient"))
 
-n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
+dn.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", dn.DO.insitu$Date, dn.DO.insitu$Time), format="%m/%d/%y %H:%M")
+
+
+
+# d.DO.insitu = filter(d.DO.insitu,
+#                        !MOATS %in% c('3', "4", "5", "11") & 
+#                          treatment %in% c("current", "allchange", "hightemperature"))
+# 
+# d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
+# 
+# 
+# n.DO.insitu = filter(n.DO.insitu,
+#                        !MOATS %in% c('3', "4", "5", "11") & 
+#                          treatment %in% c("current", "allchange", "hightemperature") &
+#                             !treatment %in% c("Ambient"))
+# 
+# n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
 
 spec.insitu = filter(spec.insitu,
                        !unit_number %in%  c('3', "4", "5", "11"))
 
 spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
+
+
+
+
 ```
 
 
