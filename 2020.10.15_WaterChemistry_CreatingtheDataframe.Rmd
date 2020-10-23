@@ -957,8 +957,12 @@ dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
 #### 10.2b SPEC insitu data 
 ```{r 10.2b SPEC insitu data }
 
-
 dim(spec.insitu)
+
+spec.insitu$ObservationDate <- ""
+spec.insitu$ObservationTime <- ""
+spec.insitu$ObservationDate <- as.Date(dn.DO.insitu$dateTime)
+spec.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
 
 signif(spec.insitu$time, digits = 6)
 signif(spec.insitu$period, digits = 4)
