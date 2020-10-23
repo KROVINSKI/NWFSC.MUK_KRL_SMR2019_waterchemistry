@@ -858,7 +858,7 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.c
 
 
 #### 10.2 Filtering and Modifying Data for insitu measurements
-```{r}
+```{r 10.2 Filtering and Modifying Data for insitu measurements}
 d.DO.insitu = filter(d.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
                          treatment %in% c("current", "allchange", "hightemperature"))
@@ -879,6 +879,21 @@ spec.insitu = filter(spec.insitu,
 
 spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
 ```
+
+
+
+#### 10.2a Bringing Day and Night Datasets Together
+```{r}
+
+dim(d.DO.insitu)
+dim(n.DO.insitu)
+
+DO.insitu <- merge(d.DO.insitu, n.DO.insitu,by="dateTime")
+
+
+
+```
+
 
 
 
