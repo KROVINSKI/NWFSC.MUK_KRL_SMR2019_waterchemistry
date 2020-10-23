@@ -136,6 +136,7 @@ n.temp.insitu <- read.csv(file = "KRL19_insitu_sample_aTemperature_Night.csv", s
 d.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Day.csv", stringsAsFactors = FALSE)
 n.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night.csv", stringsAsFactors = FALSE)
 
+dn.DO.insitu <- read.csv(file = "DO.PreSens.Krill.DayNight.csv", stringsAsFactors = FALSE))
 
 spec.insitu <- read.csv(file = "2020.10.14_SpecData.csv", stringsAsFactors = FALSE)
 
