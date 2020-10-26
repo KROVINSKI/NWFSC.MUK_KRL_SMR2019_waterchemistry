@@ -964,32 +964,38 @@ dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
 
 dim(spec.insitu)
 
+# filtering out broken and ambient MOATs
 spec.insitu = filter(spec.insitu,
                        !unit_number %in%  c('3', "4", "5", "11"))
 
+# creating observation Dates and observation time to create period simular to existing system data set
 spec.insitu$ObservationDate <- ""
 spec.insitu$ObservationTime <- ""
-# spec.insitu$ObservationDate <- as.Date(spec.insitu$Date)
+
+# converting time from a fraction of the day by seconds to regular time
+# Extracting Hours
+spec.insitu$hours <- ""
+spec.insitu$hours <- (round(spec.insitu$HoursFromMID, digits = 0))
+
+# Extracting Minutes
+spec.insitu$minutes <- ""
+spec.insitu$minutes <- (spec.insitu$HoursFromMID %% 1)*60
+spec.insitu$minutes <- (round(spec.insitu$minutes, digits = 0))
+
+# Creating a character string seperated by semicolon for hours and minutes
+minChar <- as.character(spec.insitu$minutes)
+hrChar <- as.character(spec.insitu$hours)
+
+spec.insitu$timeChar <- ""
+
+spec.insitu$timeChar <- paste(hrChar, minChar, sep=":")
 
 
-signif(spec.insitu$time, digits = 6)
+# Defining Dates
+#trail 1
+#spec.insitu$ObservationDate <- as.Date(spec.insitu$Date)
+spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
 
-
-
-
-spec.insitu <- spec.insitu %>% mutate(newtime=mdy_hms(paste0(date, "_", seconds_to_period(time*seconds.in.a.day)))) 
-
-# signif(spec.insitu$period, digits = 4)
-# 
-# spec.insitu$newtime <- ""
-# 
-# seconds_to_period(spec.insitu$time*seconds.in.a.day)
-
-
-# spec.insitu <- spec.insitu %>% mutate(rawtime=seconds_to_period(time*seconds.in.a.day))
-# spec.insitu <- spec.insitu %>% mutate(rawtime=format(as.POSIXct(time*seconds.in.a.day, origin = spec.insitu$date), "%H:%M:%s"))
-spec.insitu$rawtime <- format(as.POSIXct(spec.insitu$time*seconds.in.a.day, tz = "America/Los_Angeles", origin = spec.insitu$date), "%H:%M:%s")
-spec.insitu <-  spec.insitu %>% mutate(newertime=mdy_hms(paste0(date, "_", rawtime)))
 
 spec.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
 
@@ -998,7 +1004,7 @@ spec.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format 
 # 
 # spec.insitu$newtime <- mdy_hms(paste0)
 
-spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
+
 
 spec.insitu$ObservationTime <- ""
 
