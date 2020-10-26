@@ -864,7 +864,12 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.c
 
 dn.DO.insitu$ObservationDate <- ""
 dn.DO.insitu$ObservationTime <- ""
+dn.DO.insitu$dateTime<- ""
+
+dn.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", dn.DO.insitu$Date, dn.DO.insitu$Time), format="%m/%d/%y %H:%M")
+
 dn.DO.insitu$ObservationDate <- as.Date(dn.DO.insitu$dateTime)
+
 dn.DO.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
 
 dn.DO.insitu <- filter(dn.DO.insitu,
@@ -872,7 +877,7 @@ dn.DO.insitu <- filter(dn.DO.insitu,
                          treatment %in% c("current", "allchange", "hightemperature") &
                             !treatment %in% c("Ambient"))
 
-dn.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", dn.DO.insitu$Date, dn.DO.insitu$Time), format="%m/%d/%y %H:%M")
+
 
 dn.DO.insitu$period <-""
 
@@ -959,25 +964,36 @@ dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
 
 dim(spec.insitu)
 
-spec.insitu$ObservationDate <- ""
-spec.insitu$ObservationTime <- ""
-spec.insitu$ObservationDate <- as.Date(dn.DO.insitu$dateTime)
-spec.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
-
-signif(spec.insitu$time, digits = 6)
-signif(spec.insitu$period, digits = 4)
-
 spec.insitu = filter(spec.insitu,
                        !unit_number %in%  c('3', "4", "5", "11"))
 
+spec.insitu$ObservationDate <- ""
+spec.insitu$ObservationTime <- ""
+# spec.insitu$ObservationDate <- as.Date(spec.insitu$Date)
+
+
+signif(spec.insitu$time, digits = 6)
+
+
+
+
 spec.insitu <- spec.insitu %>% mutate(newtime=mdy_hms(paste0(date, "_", seconds_to_period(time*seconds.in.a.day)))) 
 
-spec.insitu$newtime <- ""
+# signif(spec.insitu$period, digits = 4)
+# 
+# spec.insitu$newtime <- ""
+# 
+# seconds_to_period(spec.insitu$time*seconds.in.a.day)
 
-seconds_to_period(spec.insitu$time*seconds.in.a.day)
 
-spec.insitu <- spec.insitu %>% mutate(rawtime=seconds_to_period(time*seconds.in.a.day))
+# spec.insitu <- spec.insitu %>% mutate(rawtime=seconds_to_period(time*seconds.in.a.day))
+# spec.insitu <- spec.insitu %>% mutate(rawtime=format(as.POSIXct(time*seconds.in.a.day, origin = spec.insitu$date), "%H:%M:%s"))
+spec.insitu$rawtime <- format(as.POSIXct(spec.insitu$time*seconds.in.a.day, tz = "America/Los_Angeles", origin = spec.insitu$date), "%H:%M:%s")
 spec.insitu <-  spec.insitu %>% mutate(newertime=mdy_hms(paste0(date, "_", rawtime)))
+
+spec.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
+
+
 
 # 
 # spec.insitu$newtime <- mdy_hms(paste0)
@@ -995,7 +1011,7 @@ partialtime [, time_of_day := sprintf("%02i:%02i", hour(period), minute(period))
 # partialtime <- spec.insitu[, period:= seconds_to_period(ObservationTime)]    
 
 #spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu() + 0.8541667), "%H:%M", tz="UTC")
-spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$time, "%H:%M", tz="UTC")
+spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$time, "%H:%M", tz="UTC"))
                                       
 # spec.insitu$ObservationTime <- strftime(spec.insitu, format = "%STR 32460", tz = "", usetz = FALSE,                                   strftime(32460, format = "%S")
 #                                         
