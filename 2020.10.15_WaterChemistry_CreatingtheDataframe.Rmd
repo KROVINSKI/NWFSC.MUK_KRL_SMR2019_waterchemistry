@@ -139,7 +139,7 @@ n.DO.insitu <- read.csv(file = "DO.PreSens.Krill.Night.csv", stringsAsFactors = 
 
 dn.DO.insitu <- read.csv(file = "DO.PreSens.Krill.DayNight.csv", stringsAsFactors = FALSE)
 
-spec.insitu <- read.csv(file = "2020.10.26_SpecData.csv", stringsAsFactors = FALSE)
+spec.insitu <- read.csv(file = "2020.10.26a_SpecData.csv", stringsAsFactors = FALSE)
 
 ```
 
@@ -862,10 +862,15 @@ write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.c
 #### 10.2 Filtering and Modifying Data for insitu measurements
 ```{r 10.2 Filtering and Modifying Data for insitu measurements}
 
+
+#10.2a Creating values for date and time to be applied for period
 dn.DO.insitu$ObservationDate <- ""
 dn.DO.insitu$ObservationTime <- ""
 dn.DO.insitu$dateTime<- ""
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 
+
+#10.2b Create dateTime objects
 dn.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", dn.DO.insitu$Date, dn.DO.insitu$Time), format="%m/%d/%y %H:%M")
 
 dn.DO.insitu$ObservationDate <- as.Date(dn.DO.insitu$dateTime)
@@ -876,9 +881,10 @@ dn.DO.insitu <- filter(dn.DO.insitu,
                        !MOATS %in% c('3', "4", "5", "11") & 
                          treatment %in% c("current", "allchange", "hightemperature") &
                             !treatment %in% c("Ambient"))
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 
 
-
+#10.2bc Creating period with same argument as appiled to dml/Cdml/ and H2Ochemdf
 dn.DO.insitu$period <-""
 
 dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
@@ -917,7 +923,7 @@ dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
 )
 
 ) 
-
+#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 
 # d.DO.insitu = filter(d.DO.insitu,
 #                        !MOATS %in% c('3', "4", "5", "11") & 
@@ -957,12 +963,21 @@ dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
 
 ```
 
+```{r}
+
+```
 
 
 #### 10.2b SPEC insitu data 
 ```{r 10.2b SPEC insitu data }
 
 dim(spec.insitu)
+
+spec.insitu$treatment <- ""
+spec.insitu$treatment[spec.insitu$unit_number == "7" | spec.insitu$unit_number== "10" | spec.insitu$unit_number== "12"] <- "current"
+spec.insitu$treatment[spec.insitu$unit_number == "1"| spec.insitu$unit_number== "6"] <- "hightemperature"
+spec.insitu$treatment[spec.insitu$unit_number == "2"| spec.insitu$unit_number== "8" | spec.insitu$unit_number== "13"] <- "allchange"
+spec.insitu$treatment[spec.insitu$unit_number == "3"| spec.insitu$unit_number == "4" | spec.insitu$unit_number == "5" | spec.insitu$unit_number== "11"] <- "broken_and_ambientbroken"
 
 # filtering out broken and ambient MOATs
 spec.insitu = filter(spec.insitu,
@@ -991,62 +1006,70 @@ spec.insitu$timeChar <- ""
 spec.insitu$timeChar <- paste(hrChar, minChar, sep=":")
 
 
-# Defining Dates
-#trail 1
-#spec.insitu$ObservationDate <- as.Date(spec.insitu$Date)
-spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
+#Creating a date time for SPEC measurements
+spec.insitu$dateTime <- ""
 
 
-spec.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
+spec.insitu$dateTime <- as.POSIXct(paste(spec.insitu$date,
+                                            spec.insitu$timeChar), "%m/%d/%y %H:%M", tz="UTC")
 
 
+spec.insitu$ObservationDate <- as.Date(spec.insitu$dateTime)
 
-# 
-# spec.insitu$newtime <- mdy_hms(paste0)
+spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$dateTime) ,format = "%H:%M")
 
 
+spec.insitu$period <-""
 
-spec.insitu$ObservationTime <- ""
+spec.insitu <- spec.insitu %>% mutate(period=case_when(
+  (ObservationDate >= "2019-09-23") 
+  & (ObservationDate <="2019-10-05") 
+  & (ObservationTime >= "12:00:00") 
+  & (ObservationTime <="21:00:00") ~"night",
+  
+  (ObservationDate >= "2019-10-05")
+  & (ObservationDate <= "2019-10-30")
+  & (ObservationTime >= "12:31:00") 
+  & (ObservationTime <="21:00:00") ~"night",
+  
+  (ObservationDate >= "2019-09-23") 
+  & (ObservationDate <="2019-10-05")
+  & ((ObservationTime >= "21:01:00") 
+     | (ObservationTime <="11:29:00")) ~"day",
+  
+  (ObservationDate >= "2019-10-05")
+  & (ObservationDate <= "2019-10-30")
+  & ((ObservationTime >= "21:01:00")
+     | (ObservationTime <= "12:01:00")) ~"day",
+  
+  (ObservationDate >= "2019-09-23") 
+  & (ObservationDate <="2019-10-05")
+  & ((ObservationTime >= "11:30:00") 
+     | (ObservationTime <="12:00:00")) ~"D2Nramp",
+  
+  (ObservationDate >= "2019-10-05")
+  & (ObservationDate <= "2019-10-30")
+  & ((ObservationTime >= "12:01:00")
+     | (ObservationTime <= "12:30:00")) ~"D2Nramp",
 
-seconds.in.a.day <- 86400
-spec.insitu$ObservationTime <- spec.insitu$time*86400
+  
+  TRUE ~"other"
+)
 
-partialtime <- spec.insitu %>% mutate(period=seconds_to_period(ObservationTime)) %>% mutate(time_of_day=sprintf("%02i:%02i", hour(period), minute(period)))
+) 
 
-partialtime [, time_of_day := sprintf("%02i:%02i", hour(period), minute(period))]
-# partialtime <- spec.insitu[, period:= seconds_to_period(ObservationTime)]    
 
-#spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu() + 0.8541667), "%H:%M", tz="UTC")
-spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$time, "%H:%M", tz="UTC"))
-                                      
-# spec.insitu$ObservationTime <- strftime(spec.insitu, format = "%STR 32460", tz = "", usetz = FALSE,                                   strftime(32460, format = "%S")
-#                                         
-                                        
-spec.insitu$ObservationTime <- strftime(strftime(32460, format = "%S"))
-# # create sample data
-# dt <- data.table(seconds_of_day = 60 * 15 * seq(11, 77, 11))
-# # convert seconds to period
-# dt[, period := seconds_to_period(seconds_of_day)]
-# # convert period to time of day _as character string_ !
-# dt[, time_of_day := sprintf("%02i:%02i", hour(period), minute(period))]
-# # d
+spec.insitu <- filter(spec.insitu,
+                       !unit_number %in% c('3', "4", "5", "11") & 
+                         treatment %in% c("current", "allchange", "hightemperature") &
+                         period != "other")
+
+
+# #filteredSPECFrame$unit_number <- droplevels(filteredSPECFrame$unit_number)
+# filteredSPECFrame$treatment <- factor(filteredSPECFrame$treatment)
+
 
 ```
-
-
-
-#### 10.3 Filtering the DO measurements to clean up Day/Night Periods
-```{r}
-
-
-dml$period <- ""
-
-
-][```
-
-
-
-
 
 
 # 11.0) DO averages- days and nights
@@ -1167,10 +1190,9 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summa
                           colour = "red") +
             facet_wrap(~period) +
 
-            geom_jitter(data = d.DO.insitu, aes(treatment, actualDOmg),
+            geom_jitter(data = dn.DO.insitu, aes(treatment, actualDOmg),
                                 color = "black") +
-            geom_jitter(data = n.DO.insitu, aes(treatment, actualDOmg),
-                                color = "black") +
+
   
               facet_wrap(~period) +
   
@@ -1180,23 +1202,6 @@ plerts
 
 ```
 
-```{r 12.3a Trying to get Jitter Points into the MOATs timeseries for DO plots}
-
-ggplot(, aes(x=ObservationDate, 
-                                   y=actualDOmg))+
-                                geom_point(aes(colour=treatment, point=)) +
-  
-                                facet_grid(~period) +
-  
-                                # geom_jitter(data = d.DO.insitu, aes(Date, actualDOmg),
-                                # color = "black") +
-                                # 
-                                # geom_jitter(data = n.DO.insitu, aes(Date, actualDOmg),
-                                # color = "black") +
-                                # 
-  ggtitle("Assumed Saturation of Dissolved Oxygen Across all MOATS Timeseries")
-
-```
 
 #### 12.3b Only insitu observations DO plots
 ```{r 12.3b Only insitu observations DO plots}
@@ -1224,7 +1229,14 @@ ggplot(H2Ochemdf, aes(treatment, pH)) +
             geom_errorbar(data = H2Ochemdf.daynight.pH.summary,
                           aes(x=treatment, y=mean, ymin = mean-ci, ymax = mean+ci),
                           colour = "red") +
+  
+            geom_jitter(data = spec.insitu, aes(treatment, pH),
+                                color = "black") +
+
             facet_wrap(~period) +
+  
+  
+  
             ggtitle("All Treatments, Water Chemistry pH, Across Periods") +
             theme_bw()
 
@@ -1233,28 +1245,23 @@ ggplot(H2Ochemdf, aes(treatment, pH)) +
 
 
 
-#### 13.1b Only insitu observations pH plots
-```{r 13.1b Only insitu observations pH plots}
-ggplot(spec.insitu, aes(x=Treatment, 
-                        y=pH))+
-                        geom_point(aes(colour=treatment, point=)) +
-                        ggtitle("pH Across all MOATS")  
+#### 13.1a SPEC data Summarized
+```{r 13.1a pH Day/Night insitu Summary}
+
+dim(spec.insitu)
+
+pH.insitu.daynight.pH.summary <- spec.insitu %>% group_by(treatment, period) %>%
+  summarize(sd = sd(pH, na.rm = TRUE), 
+            mean = mean(pH, na.rm = TRUE), 
+            median = median(pH, na.rm = TRUE),
+            IQR = IQR(pH, na.rm = TRUE),
+            n = n(), .groups= "drop_last") %>%
   
-```
+  mutate(se = sd/sqrt(n)) %>%
+  mutate(ci = se*1.96)
 
 
-
-
-#### 13.1a Simple Violin Plot for pH
-```{r 13.1a Simple Violin Plot for pH}
-## 13.1a Simple violin plot
-# note that day and night are not filtered
-pHviolinplot1 <-    ggplot(H2Ochemdf, 
-                aes(x=H2Ochemdf$pH, 
-                y=H2Ochemdf$treatment)) + 
-        geom_violin() 
-
-pHviolinplot1
+write.csv(pH.insitu.daynight.pH.summary, "2020.10.26_pH.insitu.daynight.pH.summary.csv")
 ```
 
 
@@ -1686,56 +1693,205 @@ Filtering data focused around throwing out incongruous temperatures and dropping
 
 #### A.4.1 Filtering Data
 ```{r A.4.1 Filtering Data}
+
 #*********************************
-## Filtering Data- 
+## Filtering Data- Temp
 #*********************************
 
 
-filteredFrame = filter(H2Ochemdf,
-                       !moats %in% c('M03', "M04", "M05", "M11") & 
-                         (aTemperature>= 5 & aTemperature<=30) &
-                         treatment %in% c("current", "allchange", "hightemperature") &
-                         period != "other")
-
-d.temp.insitu = filter(d.temp.insitu,
-                       !moats %in% c('M03', "M04", "M05", "M11") & 
-                         (aTemperature>= 5 & aTemperature<=30) &
-                         treatment %in% c("current", "allchange", "hightemperature") &
-                         period != "other")
-
-n.temp.insitu = filter(n.temp.insitu,
-                       !moats %in% c('M03', "M04", "M05", "M11") & 
-                         (aTemperature>= 5 & aTemperature<=30) &
-                         treatment %in% c("current", "allchange", "hightemperature") &
-                         period != "other")
-
-class(ReferenceTime)
-
-d.DO.insitu = filter(d.DO.insitu,
-                       !MOATS %in% c('3', "4", "5", "11") & 
-                         treatment %in% c("current", "allchange", "hightemperature"))
-
-d.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", d.DO.insitu$Date, d.DO.insitu$Time), format="%m/%d/%y %H:%M")
-
-n.DO.insitu = filter(n.DO.insitu,
-                       !MOATS %in% c('3', "4", "5", "11") & 
-                         treatment %in% c("current", "allchange", "hightemperature") &
-                            !treatment %in% c("Ambient"))
-
-n.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", n.DO.insitu$Date, n.DO.insitu$Time), format="%m/%d/%y %H:%M")
-
-spec.insitu = filter(spec.insitu,
-                       !unit_number %in%  c('3', "4", "5", "11"))
-
-spec.insitu$ObservationDate <- as.POSIXct(spec.insitu$date,format = "%Y-%m-%d")
-
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-
-## 10.1a Dropping levels and factors
-filteredFrame$moats <- droplevels(filteredFrame$moats)
-filteredFrame$treatment <- factor(filteredFrame$treatment)
-
-#|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+# filteredFrame = filter(H2Ochemdf,
+#                        !moats %in% c('M03', "M04", "M05", "M11") & 
+#                          (aTemperature>= 5 & aTemperature<=30) &
+#                          treatment %in% c("current", "allchange", "hightemperature") &
+#                          period != "other")
+# 
+# d.temp.insitu = filter(d.temp.insitu,
+#                        !moats %in% c('M03', "M04", "M05", "M11") & 
+#                          (aTemperature>= 5 & aTemperature<=30) &
+#                          treatment %in% c("current", "allchange", "hightemperature") &
+#                          period != "other")
+# 
+# n.temp.insitu = filter(n.temp.insitu,
+#                        !moats %in% c('M03', "M04", "M05", "M11") & 
+#                          (aTemperature>= 5 & aTemperature<=30) &
+#                          treatment %in% c("current", "allchange", "hightemperature") &
+#                          period != "other")
+# 
+# class(ReferenceTime)
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+# 
+# 
+# #*********************************
+# ## Filtering Data- DO
+# #*********************************
+# 
+# #10.2a Creating values for date and time to be applied for period
+# dn.DO.insitu$ObservationDate <- ""
+# dn.DO.insitu$ObservationTime <- ""
+# dn.DO.insitu$dateTime<- ""
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+# 
+# 
+# #10.2b Create dateTime objects
+# dn.DO.insitu$dateTime <- as.POSIXct(sprintf("%s %s", dn.DO.insitu$Date, dn.DO.insitu$Time), format="%m/%d/%y %H:%M")
+# 
+# dn.DO.insitu$ObservationDate <- as.Date(dn.DO.insitu$dateTime)
+# 
+# dn.DO.insitu$ObservationTime <- format(as.POSIXct(dn.DO.insitu$dateTime) ,format = "%H:%M:%S")
+# 
+# dn.DO.insitu <- filter(dn.DO.insitu,
+#                        !MOATS %in% c('3', "4", "5", "11") & 
+#                          treatment %in% c("current", "allchange", "hightemperature") &
+#                             !treatment %in% c("Ambient"))
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+# 
+# 
+# # #10.2bc Creating period with same argument as appiled to dml/Cdml/ and H2Ochemdf
+# # dn.DO.insitu$period <-""
+# # 
+# # dn.DO.insitu <- dn.DO.insitu %>% mutate(period=case_when(
+# #   (ObservationDate >= "2019-09-23") 
+# #   & (ObservationDate <="2019-10-05") 
+# #   & (ObservationTime >= "12:00:00") 
+# #   & (ObservationTime <="21:00:00") ~"night",
+# #   
+# #   (ObservationDate >= "2019-10-05")
+# #   & (ObservationDate <= "2019-10-30")
+# #   & (ObservationTime >= "12:31:00") 
+# #   & (ObservationTime <="21:00:00") ~"night",
+# #   
+# #   (ObservationDate >= "2019-09-23") 
+# #   & (ObservationDate <="2019-10-05")
+# #   & ((ObservationTime >= "21:01:00") 
+# #      | (ObservationTime <="11:29:00")) ~"day",
+# #   
+# #   (ObservationDate >= "2019-10-05")
+# #   & (ObservationDate <= "2019-10-30")
+# #   & ((ObservationTime >= "21:01:00")
+# #      | (ObservationTime <= "12:01:00")) ~"day",
+# #   
+# #   (ObservationDate >= "2019-09-23") 
+# #   & (ObservationDate <="2019-10-05")
+# #   & ((ObservationTime >= "11:30:00") 
+# #      | (ObservationTime <="12:00:00")) ~"D2Nramp",
+# #   
+# #   (ObservationDate >= "2019-10-05")
+# #   & (ObservationDate <= "2019-10-30")
+# #   & ((ObservationTime >= "12:01:00")
+# #      | (ObservationTime <= "12:30:00")) ~"D2Nramp",
+# # 
+# #   
+# #   TRUE ~"other"
+# # )
+# # 
+# # ) |
+# #   
+# # #*********************************
+# # ## Filtering Data- pH
+# # #*********************************
+# #   
+# # dim(spec.insitu)
+# 
+# spec.insitu$treatment <- ""
+# spec.insitu$treatment[spec.insitu$unit_number == "7" | spec.insitu$unit_number== "10" | spec.insitu$unit_number== "12"] <- "current"
+# spec.insitu$treatment[spec.insitu$unit_number == "1"| spec.insitu$unit_number== "6"] <- "hightemperature"
+# spec.insitu$treatment[spec.insitu$unit_number == "2"| spec.insitu$unit_number== "8" | spec.insitu$unit_number== "13"] <- "allchange"
+# spec.insitu$treatment[spec.insitu$unit_number == "3"| spec.insitu$unit_number == "4" | spec.insitu$unit_number == "5" | spec.insitu$unit_number== "11"] <- "broken_and_ambientbroken"
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# 
+# # filtering out broken and ambient MOATs
+# spec.insitu = filter(spec.insitu,
+#                        !unit_number %in%  c('3', "4", "5", "11"))
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# 
+# # creating observation Dates and observation time to create period simular to existing system data set
+# spec.insitu$ObservationDate <- ""
+# spec.insitu$ObservationTime <- ""
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# # converting time from a fraction of the day by seconds to regular time
+# # Extracting Hours
+# spec.insitu$hours <- ""
+# spec.insitu$hours <- (round(spec.insitu$HoursFromMID, digits = 0))
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# 
+# # Extracting Minutes
+# spec.insitu$minutes <- ""
+# spec.insitu$minutes <- (spec.insitu$HoursFromMID %% 1)*60
+# spec.insitu$minutes <- (round(spec.insitu$minutes, digits = 0))
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# 
+# # Creating a character string seperated by semicolon for hours and minutes
+# minChar <- as.character(spec.insitu$minutes)
+# hrChar <- as.character(spec.insitu$hours)
+# spec.insitu$timeChar <- ""
+# spec.insitu$timeChar <- paste(hrChar, minChar, sep=":")
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# 
+# #Creating a date time for SPEC measurements
+# spec.insitu$dateTime <- ""
+# spec.insitu$dateTime <- as.POSIXct(paste(spec.insitu$date,
+#                                             spec.insitu$timeChar), "%m/%d/%y %H:%M", tz="UTC")
+# spec.insitu$ObservationDate <- as.Date(spec.insitu$dateTime)
+# spec.insitu$ObservationTime <- format(as.POSIXct(spec.insitu$dateTime) ,format = "%H:%M")
+# 
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# 
+# # Applying standard period interval argument
+# spec.insitu$period <-""
+# 
+# spec.insitu <- spec.insitu %>% mutate(period=case_when(
+#   (ObservationDate >= "2019-09-23") 
+#   & (ObservationDate <="2019-10-05") 
+#   & (ObservationTime >= "12:00:00") 
+#   & (ObservationTime <="21:00:00") ~"night",
+#   
+#   (ObservationDate >= "2019-10-05")
+#   & (ObservationDate <= "2019-10-30")
+#   & (ObservationTime >= "12:31:00") 
+#   & (ObservationTime <="21:00:00") ~"night",
+#   
+#   (ObservationDate >= "2019-09-23") 
+#   & (ObservationDate <="2019-10-05")
+#   & ((ObservationTime >= "21:01:00") 
+#      | (ObservationTime <="11:29:00")) ~"day",
+#   
+#   (ObservationDate >= "2019-10-05")
+#   & (ObservationDate <= "2019-10-30")
+#   & ((ObservationTime >= "21:01:00")
+#      | (ObservationTime <= "12:01:00")) ~"day",
+#   
+#   (ObservationDate >= "2019-09-23") 
+#   & (ObservationDate <="2019-10-05")
+#   & ((ObservationTime >= "11:30:00") 
+#      | (ObservationTime <="12:00:00")) ~"D2Nramp",
+#   
+#   (ObservationDate >= "2019-10-05")
+#   & (ObservationDate <= "2019-10-30")
+#   & ((ObservationTime >= "12:01:00")
+#      | (ObservationTime <= "12:30:00")) ~"D2Nramp",
+# 
+#   
+#   TRUE ~"other"
+# )
+# 
+# ) 
+# 
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
+# 
+# 
+# spec.insitu <- filter(spec.insitu,
+#                        !unit_number %in% c('3', "4", "5", "11") & 
+#                          treatment %in% c("current", "allchange", "hightemperature") &
+#                          period != "other")
+#   
+# #|- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |  
 
 ```
 
@@ -1791,7 +1947,7 @@ ggplot(Cdml, aes(treatment, aTemperature)) +
 
 
 #### A.5.3 Summary Tables-DO Day/Night Summary
-```{r A.5.3 Summary Tables-DO Day/Night Summary}
+```{r A.5.3 DO Day/Night Summary}
 
 dim(H2Ochemdf)
 
@@ -1806,8 +1962,7 @@ H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period)
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.15_H2Ochemdf_daynight_actualDO_summary.csv")
-
+write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.26_H2Ochemdf_daynight_actualDO_summary.csv")
 kable(H2Ochemdf.daynight.actualDO.summary, digits=2)
 
 ```
@@ -1829,11 +1984,8 @@ ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
                           colour = "red") +
             facet_wrap(~period) +
   
-            # geom_jitter(data = d.DO.insitu, aes(Treatment, actualDOmg),
-            #                     color = "black") +
-            # geom_jitter(data = n.DO.insitu, aes(Treatment, actualDOmg),
-            #                     color = "black") +
-  
+            geom_jitter(data = dn.DO.insitu, aes(treatment, actualDOmg),
+                                color = "black") +
   
             ggtitle("All Treatments, Actual Dissolved Oxygen (mg) Across Periods") +
             theme_bw()
@@ -1859,7 +2011,7 @@ H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summary.csv")
+write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.26_H2Ochemdf_daynight_pH_summary.csv")
 
 kable(H2Ochemdf.daynight.pH.summary, digits=2)
 
@@ -1879,24 +2031,20 @@ ggplot(H2Ochemdf, aes(treatment, pH)) +
             geom_errorbar(data = H2Ochemdf.daynight.pH.summary,
                           aes(x=treatment, y=mean, ymin = mean-ci, ymax = mean+ci),
                           colour = "red") +
+  
+            geom_jitter(data = spec.insitu, aes(treatment, pH),
+                                color = "black") +
+
             facet_wrap(~period) +
+  
+  
+  
             ggtitle("All Treatments, Water Chemistry pH, Across Periods") +
             theme_bw()
-
-
 ```
 
 
 
-Where I still need help
-
-Getting my jitter plots to work
-understanding the time format from the SPEC files
-
-![SPECdemicalTime](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/helpwithspecinsitu.png)
-
-
-how to plot the remaining ECDF plots
 
 
 
