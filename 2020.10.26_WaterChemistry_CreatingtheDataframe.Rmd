@@ -797,7 +797,7 @@ H2Ochemdf <- H2Ochemdf  %>% filter(!moats %in% c("M03", "M04", "M05", "M11")) %>
   filter(period != "other")
 
 
-write.csv(H2Ochemdf, "2020.10.15_H2Ochemdf.csv")
+write.csv(H2Ochemdf, "2020.11.22_H2Ochemdf.csv")
 
 ```
 
@@ -852,7 +852,7 @@ Cdml.daynight.aTemp.summary <- Cdml %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-write.csv(Cdml.daynight.aTemp.summary, "2020.10.16_Cdml_daynight_aTemp_summary.csv")
+write.csv(Cdml.daynight.aTemp.summary, "2020.11.22_Cdml_daynight_aTemp_summary.csv")
 
 
 
@@ -1150,7 +1150,7 @@ H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period)
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.15_H2Ochemdf_daynight_actualDO_summary.csv")
+write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.11.22_H2Ochemdf_daynight_actualDO_summary.csv")
 
 ```
 #### 12.2 pH Day/Night Summary
@@ -1169,7 +1169,7 @@ H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summary.csv")
+write.csv(H2Ochemdf.daynight.pH.summary, "2020.11.22_H2Ochemdf_daynight_pH_summary.csv")
 
 ```
 
@@ -1177,7 +1177,7 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summa
 
 #### 12.3 DO Water Chemistry PlotsSummary Table Plots
 ```{r 12.3 Summary Table Plots}
- plerts <- ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
+DOplot12.3 <- ggplot(H2Ochemdf, aes(treatment, actualDOmg)) +
             geom_jitter(color = "grey") +
             
             geom_boxplot(notch = TRUE, outlier.shape = NA, colour = "green") +
@@ -1198,7 +1198,7 @@ write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.15_H2Ochemdf_daynight_pH_summa
   
             ggtitle("All Treatments, Actual Dissolved Oxygen (mg) Across Periods") +
             theme_bw()
-plerts
+DOplot12.3 
 
 ```
 
@@ -1213,7 +1213,23 @@ ggplot(n.DO.insitu, aes(x=treatment,
 ```
 
 
+#### 12.x DO data Summarized
+```{r 12.x DO Day/Night insitu Summary}
 
+dim(dn.DO.insitu)
+
+DO.insitu.daynight.summary <- dn.DO.insitu %>% group_by(treatment, period) %>%
+  summarize(sd = sd(actualDOmg, na.rm = TRUE), 
+            mean = mean(actualDOmg, na.rm = TRUE), 
+            median = median(actualDOmg, na.rm = TRUE),
+            IQR = IQR(actualDOmg, na.rm = TRUE),
+            n = n(), .groups= "drop_last") %>%
+  
+  mutate(se = sd/sqrt(n)) %>%
+  mutate(ci = se*1.96)
+
+write.csv(DO.insitu.daynight.summary, "2020.11.22_DO.insitu.daynight.summary.csv")
+```
 
 
 
@@ -1273,7 +1289,7 @@ pH.insitu.daynight.pH.summary <- spec.insitu %>% group_by(treatment, period) %>%
 
 
 
-write.csv(pH.insitu.daynight.pH.summary, "2020.10.26_pH.insitu.daynight.pH.summary.csv")
+write.csv(pH.insitu.daynight.pH.summary, "2020.11.22_pH.insitu.daynight.pH.summary.csv")
 ```
 
 
@@ -1931,7 +1947,7 @@ Cdml.daynight.aTemp.summary <- Cdml %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-write.csv(Cdml.daynight.aTemp.summary, "2020.10.15_Cdml_daynight_aTemp_summary.csv")
+write.csv(Cdml.daynight.aTemp.summary, "2020.11.22_Cdml_daynight_aTemp_summary.csv")
 
 kable(Cdml.daynight.aTemp.summary, digits = 2)
 ```
@@ -1974,7 +1990,7 @@ H2Ochemdf.daynight.actualDO.summary <- H2Ochemdf %>% group_by(treatment, period)
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.10.26_H2Ochemdf_daynight_actualDO_summary.csv")
+write.csv(H2Ochemdf.daynight.actualDO.summary, "2020.11.22_H2Ochemdf_daynight_actualDO_summary.csv")
 kable(H2Ochemdf.daynight.actualDO.summary, digits=2)
 
 ```
@@ -2023,7 +2039,7 @@ H2Ochemdf.daynight.pH.summary <- H2Ochemdf %>% group_by(treatment, period) %>%
   mutate(ci = se*1.96)
 
 
-write.csv(H2Ochemdf.daynight.pH.summary, "2020.10.26_H2Ochemdf_daynight_pH_summary.csv")
+write.csv(H2Ochemdf.daynight.pH.summary, "2020.11.22_H2Ochemdf_daynight_pH_summary.csv")
 
 kable(H2Ochemdf.daynight.pH.summary, digits=2)
 
