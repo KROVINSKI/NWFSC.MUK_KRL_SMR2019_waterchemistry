@@ -42,7 +42,7 @@ library(kableExtra)
 
 
 
-# 1. Setting the Working Directory
+# 1.) Setting the Working Directory
 1.0
 Look for all files inside the Water Chemistry folder of the "06. MOATs replication verification" folder
 ```{r 1.0 Setting Working Directory, ECHO= FALSE, message=FALSE, warning=FALSE}
@@ -78,8 +78,11 @@ Every 17th observations was selected, the observations were 24second apart.
 
 
 
+![MOATS Lab, 13unit assembly](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/13MOATs.png)
+
+
 ### 1.2 Subsampling
-For speed and ease of computations the dataframe was extermely subsampled. 
+For speed and ease of computations the dataframe was extremely subsampled. 
 Instead of the standard "n17" used in the aquarium temperature investigation, this document subsampled at "n333".
 
 
@@ -226,6 +229,13 @@ Krill Night Starts 1200 (~1230*) and ends 2100
 Krill Days Starts 2101 and ends 1159 (~1229*) 
 Interval 1 start 1200 23SEP19, end 1229 05OCT19
 Interval 2 start 1230 05OCT19, end 2100 30OCT19
+
+Krill room, MOATS Lab was keep in low lights conditions throughout the experiment
+Day and night conditions were governed by flow and no-flow periods. 
+Flow was controlled with a solenoid valve.
+
+
+![Solenoid Valve, Upstream of Animal Box](/Users/katherinerovinski/GIT/NWFSC.MUK_KRL_SMR2019_waterchemistry/waterchem_system_solenoid_picture1.png)
 
 
 
@@ -646,6 +656,8 @@ plot8.10
 The Library wql is required for the following chunk 
 The package name stands for ``water quality'' and reflects the # original focus on time series data for physical and chemical # properties of water, as well as the biota. Intended for # programs that sample approximately monthly, quarterly or # annually at discrete stations, a feature of many legacy data # sets. Most of the functions should be useful for analysis of # similar-frequency time series
 regardless of the subject # matter.
+
+PreSens optical oxygen Fitbox4 sensor and oxygen sensor spots (SP-PSt3-NAU-D5-YOP)
 
 
 
@@ -1229,6 +1241,12 @@ write.csv(DO.insitu.daynight.summary, "2020.11.22_DO.insitu.daynight.summary.csv
 
 
 # 13.1 pH Water Chemistry Plots (Summary Table Plots)
+
+Honeywell Durafet III pH probe
+pH conditions in each replicate were monitored via spectrophotometry using an Ocean Optics USB 230 2000+ Fiber Optic Spectometer and a 5mM solution of m-cresol purple indicator dye (Sigma Aldrich). 
+
+
+
 ```{r 13.1 Water Chemistry - pH Summary Table Plots}
 H2Ochemplot1 <- ggplot(H2Ochemdf, aes(treatment, pH)) +
             geom_jitter(color = "grey") +
