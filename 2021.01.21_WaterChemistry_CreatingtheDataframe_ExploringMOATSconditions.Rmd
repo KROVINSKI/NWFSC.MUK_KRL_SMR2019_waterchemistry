@@ -18,6 +18,7 @@ output:
 #*********************************
 ##Libraries
 #********************************* 
+# data management and organization
 library(shiny)
 library(tidyverse)
 library(stringr)
@@ -25,19 +26,26 @@ library(readxl)
 library(readr)
 library(tidyr)
 library(yaml)
+library(lubridate)
+
+# Plotting & Presentation
+library(ggplot2)
 library(dplyr)
 library(data.table)
-library(lubridate)
 library(violinmplot)
 library(vioplot)
 library(yarrr)
-library(datapasta)
-library(lubridate)
-library(reprex)
 library(miniUI)
 library(gridExtra)
 library(wql)
 library(kableExtra)
+library(patchwork)
+
+# Troubleshooting
+library(reprex)
+library(datapasta)
+library(tibble)
+
 ```
 
 
